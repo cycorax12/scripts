@@ -15,6 +15,12 @@ def modify_jenkinsfile(input_file, output_file):
     with open(input_file, 'r') as f:
         content = f.read()
     
+    # Print the content for debugging
+    print("Original Jenkinsfile content:")
+    print("-" * 40)
+    print(content)
+    print("-" * 40)
+    
     # Find the stages block
     stages_pattern = r"(stages\s*\{)\s*([\s\S]*?)(\s*\})"
     stages_match = re.search(stages_pattern, content, re.DOTALL)
@@ -27,21 +33,55 @@ def modify_jenkinsfile(input_file, output_file):
     stages_content = stages_match.group(2)  # content between brackets
     stages_end = stages_match.group(3)  # "}"
     
-    # Find the Build container image stage
-    container_stage_pattern = r"(stage\s*\(\s*['\"]Build container image['\"][\s\S]*?\{[\s\S]*?\})"
-    container_match = re.search(container_stage_pattern, stages_content, re.DOTALL)
+    # More flexible regex pattern for finding stages
+    container_stage_pattern = r"(stage\s*\(\s*['\"]Build\s*container\s*image['\"][\s\S]*?(?:^[ \t]*\}))"
+    ecs_stage_pattern = r"(stage\s*\(\s*['\"]Build\s*ECS\s*deployment\s*image['\"][\s\S]*?(?:^[ \t]*\}))"
     
-    # Find the Build ECS deployment image stage
-    ecs_stage_pattern = r"(stage\s*\(\s*['\"]Build ECS deployment image['\"][\s\S]*?\{[\s\S]*?\})"
-    ecs_match = re.search(ecs_stage_pattern, stages_content, re.DOTALL)
+    # Search for stages with multiline and DOTALL flags
+    container_matches = list(re.finditer(container_stage_pattern, stages_content, re.DOTALL | re.MULTILINE))
+    ecs_matches = list(re.finditer(ecs_stage_pattern, stages_content, re.DOTALL | re.MULTILINE))
     
-    if not container_match or not ecs_match:
-        print("Error: Could not find both required stages in the Jenkinsfile")
-        sys.exit(1)
+    # Debug output
+    print(f"Found {len(container_matches)} container stage matches")
+    print(f"Found {len(ecs_matches)} ECS stage matches")
+    
+    if not container_matches or not ecs_matches:
+        # Try alternate pattern as a fallback
+        print("Using alternate pattern for stage detection...")
+        
+        # Try to find any stage that contains the keywords
+        container_stage_pattern = r"(stage\s*\([^\)]*container[^\)]*\)[\s\S]*?(?:^[ \t]*\}))"
+        ecs_stage_pattern = r"(stage\s*\([^\)]*ECS[^\)]*\)[\s\S]*?(?:^[ \t]*\}))"
+        
+        container_matches = list(re.finditer(container_stage_pattern, stages_content, re.DOTALL | re.MULTILINE))
+        ecs_matches = list(re.finditer(ecs_stage_pattern, stages_content, re.DOTALL | re.MULTILINE))
+        
+        print(f"Found {len(container_matches)} container stage matches with alternate pattern")
+        print(f"Found {len(ecs_matches)} ECS stage matches with alternate pattern")
+        
+        if not container_matches or not ecs_matches:
+            print("Error: Could not find both required stages in the Jenkinsfile")
+            print("Please check that your Jenkinsfile contains 'Build container image' and 'Build ECS deployment image' stages.")
+            
+            # Show all stage names found
+            all_stages_pattern = r"stage\s*\(\s*['\"]([^'\"]+)['\"]"
+            all_stages = re.findall(all_stages_pattern, stages_content)
+            if all_stages:
+                print("Found stages:", ", ".join(all_stages))
+                
+            sys.exit(1)
     
     # Get the full stage blocks
-    container_stage = container_match.group(1).strip()
-    ecs_stage = ecs_match.group(1).strip()
+    container_stage = container_matches[0].group(1).strip()
+    ecs_stage = ecs_matches[0].group(1).strip()
+    
+    # Print the extracted stages for debugging
+    print("Extracted container stage:")
+    print(container_stage)
+    print("-" * 40)
+    print("Extracted ECS stage:")
+    print(ecs_stage)
+    print("-" * 40)
     
     # Remove these stages from the original content
     new_stages_content = stages_content
