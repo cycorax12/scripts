@@ -20,7 +20,10 @@ As part of our ongoing optimization efforts, we are adjusting CPU and memory all
 - **UAT4 Environment**: **UAT4 will be fully replenished** only when needed, ensuring resources are allocated as required and reallocation will be performed if necessary in the future.
 - **UAT2 Environment**: Will **always mirror production replica levels** for consistency and to simulate production-like conditions.
 
-These changes are designed to ensure each environment is optimally resourced based on actual needs, minimizing waste and maximizing the efficiency of our ECS clusters.
+Resource Allocation Guidelines:
+As part of our resource management strategy, please note that our utilization target for resource allocation requests is 35% or more. This means we will only reach out to the central team for additional resources if utilization exceeds this threshold, ensuring we optimize current allocations before seeking more.
+
+These changes are part of our broader initiative to ensure each environment is efficiently resourced, minimizing waste and maximizing the effectiveness of our ECS clusters.
 
 If you have any questions or concerns, or anticipate any impacts, please feel free to reach out.
 
