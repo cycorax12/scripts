@@ -1,0 +1,34 @@
+Certainly! Here's the updated email with a table showing the current usage of clusters across non-production environments. I've added placeholders for the cluster details, which you can fill in with actual data.
+
+---
+
+**Subject:** ECS Cluster Optimization – Reducing Over-Allocation & Improving Efficiency
+
+Dear Team,
+
+As part of our ongoing optimization efforts, we are adjusting CPU and memory allocations across our ECS clusters to eliminate over-allocation and improve resource efficiency. Below is a snapshot of the current usage of clusters across our non-production environments:
+
+| **Environment** | **Current CPU Allocation** | **Current Memory Allocation** | **Current Replica Count** | **Action** |
+|-----------------|----------------------------|-------------------------------|---------------------------|------------|
+| **UAT3**        | [CPU Usage]                | [Memory Usage]                | [Replica Count]            | Downsizing replicas to better align with actual usage |
+| **Dev**         | [CPU Usage]                | [Memory Usage]                | [Replica Count]            | Downsizing replicas to better align with actual usage |
+| **UAT4**        | [CPU Usage]                | [Memory Usage]                | [Replica Count]            | Replenishing only when required (reallocation if needed) |
+| **UAT2**        | [CPU Usage]                | [Memory Usage]                | [Replica Count]            | Mirrors production replica levels |
+
+### Key Changes:
+- **UAT3 and Dev Environments**: We will be **downsizing replicas** in these environments to reduce unnecessary resource consumption and better align with actual usage.
+- **UAT4 Environment**: **UAT4 will be fully replenished** only when needed, ensuring resources are allocated as required and reallocation will be performed if necessary in the future.
+- **UAT2 Environment**: Will **always mirror production replica levels** for consistency and to simulate production-like conditions.
+
+These changes are designed to ensure each environment is optimally resourced based on actual needs, minimizing waste and maximizing the efficiency of our ECS clusters.
+
+If you have any questions or concerns, or anticipate any impacts, please feel free to reach out.
+
+Best regards,  
+[Your Name]  
+[Your Position]  
+[Your Contact Information]
+
+---
+
+Feel free to replace the placeholders with the actual usage data for CPU, memory, and replica counts. If you need any additional adjustments or specific formatting for the table, let me know!
