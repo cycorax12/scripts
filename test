@@ -1,9 +1,1 @@
-Here’s a more concise version:
-
----
-
-I’d like to solve the **Agentic Requirement Engineering (ARE)** challenge because automating the process from requirement capture to code generation can greatly enhance development efficiency. By leveraging **GenAI**, we can streamline and accelerate this journey, reducing manual errors and improving alignment with business needs. It’s an exciting opportunity to explore GenAI and its potential to transform the software development lifecycle.
-
----
-
-Does this work better for you?
+I built an OpenShift Migration Tool that helps developers seamlessly migrate workloads from DeploymentConfig to Deployments, reducing manual effort and errors. I also developed Smart JIRA, which leverages GenAI to auto-generate high-quality, standardized JIRA tickets, improving consistency and saving time across teams. Both solutions reflect innovative thinking and practical application of automation and GenAI to solve real engineering challenges.
