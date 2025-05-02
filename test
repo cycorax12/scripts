@@ -1,9 +1,9 @@
-Here’s the updated version with JUnit included:
+Here’s a more concise version:
 
 ---
 
-I’ve led the introduction of engineering methods focused on quality by implementing tools like Bitbucket for code reviews, SONAR for static analysis, Delpyne as a code review agent, and JUnit for testing. These, along with coding standards and CI/CD practices, ensure high-quality, standardized, and reusable code.
+I’d like to solve the **Agentic Requirement Engineering (ARE)** challenge because automating the process from requirement capture to code generation can greatly enhance development efficiency. By leveraging **GenAI**, we can streamline and accelerate this journey, reducing manual errors and improving alignment with business needs. It’s an exciting opportunity to explore GenAI and its potential to transform the software development lifecycle.
 
 ---
 
-How does this look now?
+Does this work better for you?
