@@ -1,15 +1,25 @@
-Implement a function that determines a color indicator (green, amber, red) to reflect sprint health.
+Implement a function to calculate the Sprint Progress Index and return a health status color and label.
 
 Inputs:
-- `timePercent`: percentage of sprint time completed (0–100)
-- `donePercent`: percentage of work marked as "Done" in Jira (0–100)
+- `timePercent`: Number (0–100) – the percentage of sprint time elapsed.
+- `donePercent`: Number (0–100) – the percentage of completed work marked "Done" in Jira.
 
-Logic:
-- If `timePercent` is 10% or less, return "gray" (too early to assess).
-- Calculate `progressRatio = donePercent / timePercent`
-- Return:
-  - "green" if ratio >= 0.9 (on track)
-  - "amber" if ratio is between 0.5 and 0.9 (slightly behind)
-  - "red" if ratio < 0.5 (at risk)
+Steps:
+1. If timePercent is 10 or less, return:
+   - Color: "gray"
+   - Label: "NotStarted"
 
-Include an example usage with dummy values for testing.
+2. Calculate the Sprint Progress Index:
+   - Index = donePercent / timePercent
+
+3. Return the color and label based on the Index:
+   - If Index >= 0.9 → Color: "green", Label: "OnTrack"
+   - If Index >= 0.5 and < 0.9 → Color: "amber", Label: "Lagging"
+   - If Index < 0.5 → Color: "red", Label: "AtRisk"
+
+Output:
+- An object or tuple containing the `index` (float), `color` (string), and `statusLabel` (string)
+
+Also include an example usage with:
+- timePercent = 60
+- donePercent = 30
