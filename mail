@@ -1,25 +1,18 @@
-Implement a function to calculate the Sprint Progress Index and return a health status color and label.
-
-Inputs:
-- `timePercent`: Number (0–100) – the percentage of sprint time elapsed.
-- `donePercent`: Number (0–100) – the percentage of completed work marked "Done" in Jira.
-
-Steps:
-1. If timePercent is 10 or less, return:
-   - Color: "gray"
-   - Label: "NotStarted"
-
-2. Calculate the Sprint Progress Index:
-   - Index = donePercent / timePercent
-
-3. Return the color and label based on the Index:
-   - If Index >= 0.9 → Color: "green", Label: "OnTrack"
-   - If Index >= 0.5 and < 0.9 → Color: "amber", Label: "Lagging"
-   - If Index < 0.5 → Color: "red", Label: "AtRisk"
-
-Output:
-- An object or tuple containing the `index` (float), `color` (string), and `statusLabel` (string)
-
-Also include an example usage with:
-- timePercent = 60
-- donePercent = 30
+routes:
+  - name: proxy-depen-explorer
+    uri: /depen-explorer/*
+    plugins:
+      proxy-rewrite:
+        regex_uri:
+          - "^/depen-explorer/(.*)"
+          - "/$1"
+    upstream:
+      type: roundrobin
+      scheme: https
+      pass_host: rewrite
+      upstream_host: ymjost.com
+      nodes:
+        - host: ymjost.com
+          port: 443
+          weight: 1
+    status: 1
