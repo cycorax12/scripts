@@ -1,6 +1,9 @@
 routes:
-  - name: proxy-depen-explorer
-    uri: /depen-explorer/*
+  - name: depen-explorer-proxy
+    uris:
+      - /depen-explorer/*
+    vars:
+      - ["uri", "~", "^/depen-explorer/(.*)"]
     plugins:
       proxy-rewrite:
         regex_uri:
