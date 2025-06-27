@@ -1,22 +1,24 @@
-Subject: Migration to Apache APISIX Gateway – Rationale and Next Steps
-
-Hi Team,
-
-We will be moving to Apache APISIX as our API Gateway and service discovery solution, replacing Spring Cloud Gateway and Discovery.
-
-We have completed a basic POC and will proceed with integrating APISIX into aspen-event-resolver, which will call business rules behind the APISIX gateway.
-
-Why this change helps:
-
-Reduced library bloat: We can remove multiple Spring Cloud libraries from our services, reducing dependency complexity and potential security patch management.
-
-Lightweight gateway management: APISIX is external to our Spring Boot apps, providing a decoupled and centralised API gateway with advanced routing, plugin-based extensibility, and better performance.
-
-Easier upgrades and maintenance: No direct coupling with Spring Cloud versions, simplifying Spring Boot upgrades in the future.
-
-Enhanced observability and traffic management: APISIX offers native support for traffic splitting, rate limiting, monitoring, and security plugins, reducing our in-app implementation burden.
-
-We will share detailed integration, deployment steps, and required changes in upcoming working sessions. Please reach out if you foresee any immediate blockers or dependencies to address before migration.
-
-Thanks,
-[Your Name]
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>3.5.1</version>
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+            <transformers>
+              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                <mainClass>your.main.Class</mainClass>
+              </transformer>
+            </transformers>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
