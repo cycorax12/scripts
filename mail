@@ -1,24 +1,145 @@
-<build>
-  <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-shade-plugin</artifactId>
-      <version>3.5.1</version>
-      <executions>
-        <execution>
-          <phase>package</phase>
-          <goals>
-            <goal>shade</goal>
-          </goals>
-          <configuration>
-            <transformers>
-              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                <mainClass>your.main.Class</mainClass>
-              </transformer>
-            </transformers>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-</build>
+import requests
+from requests.auth import HTTPBasicAuth
+from datetime import datetime
+import csv
+
+# Replace with your Jira credentials
+jira_domain = "https://yourdomain.atlassian.net"
+username = "your_email@domain.com"
+api_token = "your_api_token"
+
+# Jira API endpoints
+search_url = f"{jira_domain}/rest/api/3/search"
+issue_url_template = f"{jira_domain}/rest/api/3/issue/{{issue_key}}?expand=changelog"
+
+# Utility functions
+def format_timedelta(td):
+    days = td.days
+    hours, remainder = divmod(td.seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+    return f"{days}d {hours}h {minutes}m"
+
+def timedelta_in_minutes(td):
+    return int(td.total_seconds() // 60)
+
+def get_jira_issues(jql):
+    start_at = 0
+    max_results = 100
+    issues = []
+
+    while True:
+        params = {
+            'jql': jql,
+            'startAt': start_at,
+            'maxResults': max_results,
+            'fields': 'assignee'
+        }
+        response = requests.get(search_url, params=params, auth=HTTPBasicAuth(username, api_token))
+        if response.status_code != 200:
+            print(f"Failed to fetch issues: {response.status_code}, {response.text}")
+            break
+
+        data = response.json()
+        batch = data.get('issues', [])
+        issues.extend(batch)
+
+        if start_at + max_results >= data['total']:
+            break
+        else:
+            start_at += max_results
+
+    return issues
+
+def calculate_status_durations(issue_key):
+    url = issue_url_template.format(issue_key=issue_key)
+    response = requests.get(url, auth=HTTPBasicAuth(username, api_token))
+
+    if response.status_code != 200:
+        print(f"Failed to fetch changelog for {issue_key}: {response.status_code}, {response.text}")
+        return None
+
+    data = response.json()
+    changelog = data['changelog']['histories']
+
+    first_in_progress_time = None
+    last_sign_off_time = None
+    last_done_time = None
+
+    for history in changelog:
+        transition_time = datetime.strptime(history['created'], "%Y-%m-%dT%H:%M:%S.%f%z")
+        for item in history['items']:
+            if item['field'] == 'status':
+                to_status = item['toString']
+
+                if to_status == 'In Progress':
+                    if first_in_progress_time is None or transition_time < first_in_progress_time:
+                        first_in_progress_time = transition_time
+
+                elif to_status == 'Sign Off':
+                    if last_sign_off_time is None or transition_time > last_sign_off_time:
+                        last_sign_off_time = transition_time
+
+                elif to_status == 'Done':
+                    if last_done_time is None or transition_time > last_done_time:
+                        last_done_time = transition_time
+
+    results = {}
+    if first_in_progress_time and last_sign_off_time:
+        duration = last_sign_off_time - first_in_progress_time
+        results['In Progress -> Sign Off'] = {
+            'formatted': format_timedelta(duration),
+            'minutes': timedelta_in_minutes(duration)
+        }
+    if first_in_progress_time and last_done_time:
+        duration = last_done_time - first_in_progress_time
+        results['In Progress -> Done'] = {
+            'formatted': format_timedelta(duration),
+            'minutes': timedelta_in_minutes(duration)
+        }
+
+    return results
+
+def main():
+    # JQL for issues from 1 March 2025 until now
+    jql = 'created >= "2025-03-01" ORDER BY created ASC'
+    issues = get_jira_issues(jql)
+
+    print(f"Total issues fetched: {len(issues)}\n")
+
+    # Prepare CSV
+    csv_file = "jira_durations.csv"
+    csv_columns = ['Jira ID', 'Assignee', 'Transition Type', 'Formatted Time', 'Time in Minutes']
+
+    with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=csv_columns)
+        writer.writeheader()
+
+        for issue in issues:
+            issue_key = issue['key']
+            assignee_field = issue['fields']['assignee']
+            assignee_name = assignee_field['displayName'] if assignee_field else 'Unassigned'
+
+            durations = calculate_status_durations(issue_key)
+
+            if durations:
+                for transition, data in durations.items():
+                    writer.writerow({
+                        'Jira ID': issue_key,
+                        'Assignee': assignee_name,
+                        'Transition Type': transition,
+                        'Formatted Time': data['formatted'],
+                        'Time in Minutes': data['minutes']
+                    })
+            else:
+                writer.writerow({
+                    'Jira ID': issue_key,
+                    'Assignee': assignee_name,
+                    'Transition Type': 'No valid transitions',
+                    'Formatted Time': '',
+                    'Time in Minutes': ''
+                })
+
+    print(f"Data written to {csv_file}")
+
+if __name__ == "__main__":
+    main()
