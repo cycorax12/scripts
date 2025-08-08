@@ -1,4 +1,5 @@
-SELECT minute_window, rows_updated
+SELECT TO_CHAR(minute_window, 'DD-MON-YYYY HH:MI:SS AM') AS minute_window,
+       rows_updated
 FROM (
     SELECT 
         TRUNC(LAST_UPDATED_TIME, 'MI') AS minute_window,
