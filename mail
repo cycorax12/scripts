@@ -1,10 +1,11 @@
-SELECT MAX(rows_updated) AS max_rows_per_minute
+SELECT *
 FROM (
     SELECT 
         TRUNC(LAST_UPDATED_TIME, 'MI') AS minute_window,
         COUNT(*) AS rows_updated
     FROM settlement_detail
-    WHERE LAST_UPDATED_TIME >= TO_DATE('2025-08-07 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
-      AND LAST_UPDATED_TIME <  TO_DATE('2025-08-08 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+    WHERE LAST_UPDATED_TIME >= ADD_MONTHS(TRUNC(SYSDATE), -1)
     GROUP BY TRUNC(LAST_UPDATED_TIME, 'MI')
-);
+    ORDER BY rows_updated DESC
+)
+WHERE ROWNUM <= 5;
