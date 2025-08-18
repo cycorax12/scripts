@@ -1,7 +1,12 @@
-SELECT TO_CHAR(LAST_UPDATED_TIME, 'DD-MON-YYYY HH24:MI:SS.FF3') AS ts_millis,
-       COUNT(*) AS row_count
-FROM settlement_detail
-WHERE LAST_UPDATED_TIME >= TO_TIMESTAMP('25-JUL-2025 04:23:00', 'DD-MON-YYYY HH24:MI:SS')
-  AND LAST_UPDATED_TIME <  TO_TIMESTAMP('25-JUL-2025 04:24:00', 'DD-MON-YYYY HH24:MI:SS')
-GROUP BY TO_CHAR(LAST_UPDATED_TIME, 'DD-MON-YYYY HH24:MI:SS.FF3')
-ORDER BY row_count DESC;
+SELECT
+    TRUNC(a.date_column) AS report_date,
+    COUNT(a.id) AS table_a_count,
+    (
+        SELECT COUNT(b.id)
+        FROM table_b b
+        WHERE TRUNC(b.another_date_column) = TRUNC(a.date_column)
+    ) AS table_b_count
+FROM table_a a
+WHERE a.date_column BETWEEN TO_DATE('2025-08-01', 'YYYY-MM-DD') AND TO_DATE('2025-08-31', 'YYYY-MM-DD')
+GROUP BY TRUNC(a.date_column)
+ORDER BY report_date;
