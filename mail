@@ -1,12 +1,18 @@
 SELECT
-    TRUNC(a.date_column) AS report_date,
-    COUNT(a.id) AS table_a_count,
-    (
-        SELECT COUNT(b.id)
-        FROM table_b b
-        WHERE TRUNC(b.another_date_column) = TRUNC(a.date_column)
-    ) AS table_b_count
-FROM table_a a
-WHERE a.date_column BETWEEN TO_DATE('2025-08-01', 'YYYY-MM-DD') AND TO_DATE('2025-08-31', 'YYYY-MM-DD')
-GROUP BY TRUNC(a.date_column)
-ORDER BY report_date;
+    sd.txn_id,
+    sd.settlement_date,
+    sd.amount,
+    CASE 
+        WHEN sds.txn_id IS NOT NULL THEN 'HIT'
+        ELSE 'MISS'
+    END AS match_status
+FROM
+    settlement_detail sd
+LEFT JOIN
+    sett_dsh_staging sds
+    ON sd.txn_id = sds.txn_id
+WHERE
+    -- Apply your 3 conditions on settlement_detail
+    sd.settlement_date BETWEEN TO_DATE('2025-08-01', 'YYYY-MM-DD') AND TO_DATE('2025-08-31', 'YYYY-MM-DD')
+    AND sd.amount > 0
+    AND sd.status = 'COMPLETED';  -- Example 3rd condition
