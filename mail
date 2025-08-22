@@ -1,18 +1,27 @@
-SELECT
-    sd.txn_id,
-    sd.settlement_date,
-    sd.amount,
-    CASE 
-        WHEN sds.txn_id IS NOT NULL THEN 'HIT'
-        ELSE 'MISS'
-    END AS match_status
-FROM
-    settlement_detail sd
-LEFT JOIN
-    sett_dsh_staging sds
-    ON sd.txn_id = sds.txn_id
-WHERE
-    -- Apply your 3 conditions on settlement_detail
-    sd.settlement_date BETWEEN TO_DATE('2025-08-01', 'YYYY-MM-DD') AND TO_DATE('2025-08-31', 'YYYY-MM-DD')
-    AND sd.amount > 0
-    AND sd.status = 'COMPLETED';  -- Example 3rd condition
+SELECT pk_id, net_amount, holding_type, last_updated_time
+FROM settlement_detail
+WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
+                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
+  AND last_updated_time < SYSTIMESTAMP - INTERVAL '60' SECOND
+ORDER BY last_updated_time ASC
+FETCH NEXT 500 ROWS ONLY;
+
+
+SELECT pk_id, net_amount, holding_type, last_updated_time
+FROM settlement_detail
+WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
+                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
+  AND last_updated_time < TO_TIMESTAMP('2025-08-22 09:18:00', 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '60' SECOND
+ORDER BY last_updated_time ASC
+FETCH NEXT 500 ROWS ONLY;
+
+
+
+SELECT pk_id, net_amount, holding_type, last_updated_time
+FROM settlement_detail
+WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
+                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
+  AND last_updated_time < TO_TIMESTAMP('22-AUG-25 09:18:00.000 AM', 'DD-MON-RR HH:MI:SS.FF3 AM') 
+                             - INTERVAL '60' SECOND
+ORDER BY last_updated_time ASC
+FETCH NEXT 500 ROWS ONLY;
