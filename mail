@@ -1,27 +1,65 @@
-SELECT pk_id, net_amount, holding_type, last_updated_time
-FROM settlement_detail
-WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
-                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
-  AND last_updated_time < SYSTIMESTAMP - INTERVAL '60' SECOND
-ORDER BY last_updated_time ASC
-FETCH NEXT 500 ROWS ONLY;
+import requests
 
+# Jira base URL (update with your Jira Cloud or Server URL)
+JIRA_BASE_URL = "https://your-domain.atlassian.net"
 
-SELECT pk_id, net_amount, holding_type, last_updated_time
-FROM settlement_detail
-WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
-                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
-  AND last_updated_time < TO_TIMESTAMP('2025-08-22 09:18:00', 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '60' SECOND
-ORDER BY last_updated_time ASC
-FETCH NEXT 500 ROWS ONLY;
+# Your Jira API token (Bearer auth)
+JIRA_TOKEN = "YOUR_JIRA_API_TOKEN"
+HEADERS = {
+    "Authorization": f"Bearer {JIRA_TOKEN}",
+    "Accept": "application/json"
+}
 
+def get_issues_in_epic(epic_key):
+    """
+    Find all issues linked to a given Epic.
+    Uses JQL to search by Epic Link.
+    """
+    jql = f'"Epic Link" = "{epic_key}"'
+    url = f"{JIRA_BASE_URL}/rest/api/3/search"
+    params = {
+        "jql": jql,
+        "fields": "key"
+    }
+    response = requests.get(url, headers=HEADERS, params=params)
+    response.raise_for_status()
+    data = response.json()
+    return [issue["key"] for issue in data.get("issues", [])]
 
+def check_if_project_changed(issue_key):
+    """
+    Check the changelog of an issue to see if project was changed.
+    """
+    url = f"{JIRA_BASE_URL}/rest/api/3/issue/{issue_key}?expand=changelog"
+    response = requests.get(url, headers=HEADERS)
+    response.raise_for_status()
+    changelog = response.json().get("changelog", {})
+    histories = changelog.get("histories", [])
+    
+    project_changes = []
+    for history in histories:
+        for item in history.get("items", []):
+            if item.get("field") == "project":
+                project_changes.append({
+                    "changed_at": history.get("created"),
+                    "from": item.get("fromString"),
+                    "to": item.get("toString")
+                })
+    return project_changes
 
-SELECT pk_id, net_amount, holding_type, last_updated_time
-FROM settlement_detail
-WHERE last_updated_time >= TO_TIMESTAMP('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') 
-                             + NUMTODSINTERVAL(1692697800123/1000, 'SECOND')
-  AND last_updated_time < TO_TIMESTAMP('22-AUG-25 09:18:00.000 AM', 'DD-MON-RR HH:MI:SS.FF3 AM') 
-                             - INTERVAL '60' SECOND
-ORDER BY last_updated_time ASC
-FETCH NEXT 500 ROWS ONLY;
+def main(epic_key):
+    issues = get_issues_in_epic(epic_key)
+    print(f"Found {len(issues)} issues in Epic {epic_key}")
+    
+    for issue in issues:
+        changes = check_if_project_changed(issue)
+        if changes:
+            print(f"📌 Issue {issue} moved between projects:")
+            for change in changes:
+                print(f"   - {change['changed_at']}: {change['from']} ➝ {change['to']}")
+        else:
+            print(f"✅ Issue {issue} never moved projects.")
+
+# Example usage:
+if __name__ == "__main__":
+    main("EPIC-123")  # Replace with your Epic key
