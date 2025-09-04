@@ -1,7 +1,8 @@
 import requests
+import csv
 
-# Jira base URL (update with your Jira Cloud or Server URL)
-JIRA_BASE_URL = "https://your-domain.atlassian.net"
+# Jira base URL (update with your Jira Server/DC URL)
+JIRA_BASE_URL = "https://your-domain.com"
 
 # Your Jira API token (Bearer auth)
 JIRA_TOKEN = "YOUR_JIRA_API_TOKEN"
@@ -10,27 +11,44 @@ HEADERS = {
     "Accept": "application/json"
 }
 
-def get_issues_in_epic(epic_key):
+def get_issues_in_project():
     """
-    Find all issues linked to a given Epic.
-    Uses JQL to search by Epic Link.
+    Get all issues in project ASPEN created since June 1, with pagination.
     """
-    jql = f'"Epic Link" = "{epic_key}"'
-    url = f"{JIRA_BASE_URL}/rest/api/3/search"
-    params = {
-        "jql": jql,
-        "fields": "key"
-    }
-    response = requests.get(url, headers=HEADERS, params=params)
-    response.raise_for_status()
-    data = response.json()
-    return [issue["key"] for issue in data.get("issues", [])]
+    jql = 'project = ASPEN AND created >= "2025-06-01"'
+    url = f"{JIRA_BASE_URL}/rest/api/2/search"
+
+    issues = []
+    start_at = 0
+    max_results = 1000
+
+    while True:
+        params = {
+            "jql": jql,
+            "fields": "key",
+            "startAt": start_at,
+            "maxResults": max_results
+        }
+        response = requests.get(url, headers=HEADERS, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        new_issues = [issue["key"] for issue in data.get("issues", [])]
+        issues.extend(new_issues)
+
+        if start_at + max_results >= data.get("total", 0):
+            break
+
+        start_at += max_results
+
+    return issues
 
 def check_if_project_changed(issue_key):
     """
     Check the changelog of an issue to see if project was changed.
+    Returns list of changes.
     """
-    url = f"{JIRA_BASE_URL}/rest/api/3/issue/{issue_key}?expand=changelog"
+    url = f"{JIRA_BASE_URL}/rest/api/2/issue/{issue_key}?expand=changelog"
     response = requests.get(url, headers=HEADERS)
     response.raise_for_status()
     changelog = response.json().get("changelog", {})
@@ -41,25 +59,35 @@ def check_if_project_changed(issue_key):
         for item in history.get("items", []):
             if item.get("field") == "project":
                 project_changes.append({
+                    "issue": issue_key,
                     "changed_at": history.get("created"),
                     "from": item.get("fromString"),
                     "to": item.get("toString")
                 })
     return project_changes
 
-def main(epic_key):
-    issues = get_issues_in_epic(epic_key)
-    print(f"Found {len(issues)} issues in Epic {epic_key}")
-    
+def main():
+    issues = get_issues_in_project()
+    print(f"Found {len(issues)} issues in project ASPEN since 2025-06-01")
+
+    all_changes = []
     for issue in issues:
         changes = check_if_project_changed(issue)
-        if changes:
-            print(f"📌 Issue {issue} moved between projects:")
-            for change in changes:
-                print(f"   - {change['changed_at']}: {change['from']} ➝ {change['to']}")
-        else:
-            print(f"✅ Issue {issue} never moved projects.")
+        all_changes.extend(changes)
 
-# Example usage:
+    # Write results to CSV
+    with open("jira_project_moves.csv", "w", newline="") as csvfile:
+        fieldnames = ["Issue", "Date of Move", "From Project", "To Project"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for change in all_changes:
+            writer.writerow({
+                "Issue": change["issue"],
+                "Date of Move": change["changed_at"],
+                "From Project": change["from"],
+                "To Project": change["to"]
+            })
+    print("✅ Results written to jira_project_moves.csv")
+
 if __name__ == "__main__":
-    main("EPIC-123")  # Replace with your Epic key
+    main()
