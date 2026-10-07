@@ -1,6 +1,5 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "padding": 10,
 
   "signals": [
     {
@@ -19,48 +18,33 @@
 
   "data": [
     {
-      "name": "values",
-      "url": {
-        "index": "aspen-positions-mtp",
-        "body": {
-          "size": 0,
-          "aggs": {
-            "changes_nested": {
-              "nested": {
-                "path": "changes"
-              },
-              "aggs": {
-                "fields": {
-                  "terms": {
-                    "field": "changes.field",
-                    "size": 100
-                  },
-                  "aggs": {
-                    "values": {
-                      "terms": {
-                        "field": "changes.value",
-                        "size": 100
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+      "name": "test",
+      "values": [
+        {
+          "field": "processing_status",
+          "value": "Exclude",
+          "count": 100
+        },
+        {
+          "field": "processing_status",
+          "value": "Include",
+          "count": 50
+        },
+        {
+          "field": "box_location",
+          "value": "SCM",
+          "count": 80
+        },
+        {
+          "field": "box_location",
+          "value": "NYC",
+          "count": 30
         }
-      },
-      "format": {
-        "property": "aggregations.changes_nested.fields.buckets"
-      },
+      ],
       "transform": [
         {
           "type": "filter",
-          "expr": "datum.key === selectedField"
-        },
-        {
-          "type": "flatten",
-          "fields": ["datum.values.buckets"],
-          "as": ["valueBucket"]
+          "expr": "datum.field === selectedField"
         }
       ]
     }
@@ -68,38 +52,37 @@
 
   "scales": [
     {
-      "name": "yscale",
+      "name": "x",
+      "type": "linear",
+      "domain": {
+        "data": "test",
+        "field": "count"
+      },
+      "range": "width",
+      "zero": true
+    },
+    {
+      "name": "y",
       "type": "band",
       "domain": {
-        "data": "values",
-        "field": "valueBucket.key"
+        "data": "test",
+        "field": "value"
       },
       "range": "height",
       "padding": 0.2
-    },
-    {
-      "name": "xscale",
-      "type": "linear",
-      "domain": {
-        "data": "values",
-        "field": "valueBucket.doc_count"
-      },
-      "range": "width",
-      "zero": true,
-      "nice": true
     }
   ],
 
   "axes": [
     {
-      "orient": "left",
-      "scale": "yscale",
-      "title": "Changed Value"
+      "scale": "x",
+      "orient": "bottom",
+      "title": "Count"
     },
     {
-      "orient": "bottom",
-      "scale": "xscale",
-      "title": "Count"
+      "scale": "y",
+      "orient": "left",
+      "title": "Changed Value"
     }
   ],
 
@@ -107,25 +90,25 @@
     {
       "type": "rect",
       "from": {
-        "data": "values"
+        "data": "test"
       },
       "encode": {
         "enter": {
-          "y": {
-            "scale": "yscale",
-            "field": "valueBucket.key"
-          },
-          "height": {
-            "scale": "yscale",
-            "band": 1
-          },
           "x": {
-            "scale": "xscale",
+            "scale": "x",
             "value": 0
           },
           "x2": {
-            "scale": "xscale",
-            "field": "valueBucket.doc_count"
+            "scale": "x",
+            "field": "count"
+          },
+          "y": {
+            "scale": "y",
+            "field": "value"
+          },
+          "height": {
+            "scale": "y",
+            "band": 1
           }
         }
       }
