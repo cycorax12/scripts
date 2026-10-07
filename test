@@ -1,7 +1,5 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "width": 500,
-  "height": 300,
   "padding": 10,
 
   "signals": [
@@ -24,18 +22,24 @@
           "swt_flag_manual",
           "franking"
         ]
-      },
-      "on": [
-        {
-          "events": {"signal": "selectedField"},
-          "update": "selectedField"
-        }
-      ]
+      }
     },
 
     {
       "name": "selectedValue",
-      "value": "Select value"
+      "value": "Select value",
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "datum.item.key"
+        },
+        {
+          "events": {
+            "signal": "selectedField"
+          },
+          "update": "'Select value'"
+        }
+      ]
     },
 
     {
@@ -47,19 +51,20 @@
           "update": "!dropdownOpen"
         },
         {
-          "events": "@valueItem:click",
-          "update": "false"
-        }
-      ]
-    },
-
-    {
-      "name": "setValue",
-      "value": null,
-      "on": [
+          "events": "@valueSelectorText:click",
+          "update": "!dropdownOpen"
+        },
+        {
+          "events": "@valueSelectorArrow:click",
+          "update": "!dropdownOpen"
+        },
         {
           "events": "@valueItem:click",
-          "update": "selectedValue = datum.item.key"
+          "update": "false"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "false"
         }
       ]
     }
@@ -113,13 +118,21 @@
         },
         {
           "type": "flatten",
-          "fields": ["changed_values.buckets"],
-          "as": ["item"]
+          "fields": [
+            "changed_values.buckets"
+          ],
+          "as": [
+            "item"
+          ]
         },
         {
           "type": "window",
-          "ops": ["row_number"],
-          "as": ["row"]
+          "ops": [
+            "row_number"
+          ],
+          "as": [
+            "row"
+          ]
         }
       ]
     }
@@ -130,11 +143,21 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 10},
-          "y": {"value": 35},
-          "text": {"value": "Changed Value:"},
-          "fontSize": {"value": 13},
-          "fontWeight": {"value": "bold"}
+          "x": {
+            "value": 10
+          },
+          "y": {
+            "value": 35
+          },
+          "text": {
+            "value": "Changed Value:"
+          },
+          "fontSize": {
+            "value": 13
+          },
+          "fontWeight": {
+            "value": "bold"
+          }
         }
       }
     },
@@ -144,46 +167,90 @@
       "type": "rect",
       "encode": {
         "enter": {
-          "x": {"value": 120},
-          "y": {"value": 15},
-          "width": {"value": 260},
-          "height": {"value": 32},
-          "stroke": {"value": "#888"},
-          "cornerRadius": {"value": 3},
-          "cursor": {"value": "pointer"}
+          "x": {
+            "value": 120
+          },
+          "y": {
+            "value": 15
+          },
+          "width": {
+            "value": 260
+          },
+          "height": {
+            "value": 32
+          },
+          "stroke": {
+            "value": "#888"
+          },
+          "cornerRadius": {
+            "value": 3
+          },
+          "cursor": {
+            "value": "pointer"
+          }
         },
+
         "update": {
-          "fill": {"value": "white"}
+          "fill": {
+            "value": "white"
+          }
         }
       }
     },
 
     {
+      "name": "valueSelectorText",
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 130},
-          "y": {"value": 36},
-          "fontSize": {"value": 13},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
+          "x": {
+            "value": 130
+          },
+          "y": {
+            "value": 36
+          },
+          "fontSize": {
+            "value": 13
+          },
+          "fill": {
+            "value": "black"
+          },
+          "cursor": {
+            "value": "pointer"
+          }
         },
+
         "update": {
-          "text": {"signal": "selectedValue"}
+          "text": {
+            "signal": "selectedValue"
+          }
         }
       }
     },
 
     {
+      "name": "valueSelectorArrow",
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 360},
-          "y": {"value": 36},
-          "text": {"value": "▼"},
-          "fontSize": {"value": 12},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
+          "x": {
+            "value": 360
+          },
+          "y": {
+            "value": 36
+          },
+          "text": {
+            "value": "▼"
+          },
+          "fontSize": {
+            "value": 12
+          },
+          "fill": {
+            "value": "black"
+          },
+          "cursor": {
+            "value": "pointer"
+          }
         }
       }
     },
@@ -194,17 +261,30 @@
       "from": {
         "data": "values"
       },
+
       "encode": {
         "update": {
-          "x": {"value": 120},
+          "x": {
+            "value": 120
+          },
           "y": {
             "signal": "52 + ((datum.row - 1) * 30)"
           },
-          "width": {"value": 260},
-          "height": {"value": 30},
-          "fill": {"value": "white"},
-          "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"},
+          "width": {
+            "value": 260
+          },
+          "height": {
+            "value": 30
+          },
+          "fill": {
+            "value": "white"
+          },
+          "stroke": {
+            "value": "#ddd"
+          },
+          "cursor": {
+            "value": "pointer"
+          },
           "opacity": {
             "signal": "dropdownOpen ? 1 : 0"
           }
@@ -213,20 +293,32 @@
     },
 
     {
+      "name": "valueItemText",
       "type": "text",
       "from": {
         "data": "values"
       },
+
       "encode": {
         "update": {
-          "x": {"value": 130},
+          "x": {
+            "value": 130
+          },
           "y": {
             "signal": "72 + ((datum.row - 1) * 30)"
           },
-          "text": {"field": "item.key"},
-          "fontSize": {"value": 13},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"},
+          "text": {
+            "field": "item.key"
+          },
+          "fontSize": {
+            "value": 13
+          },
+          "fill": {
+            "value": "black"
+          },
+          "cursor": {
+            "value": "pointer"
+          },
           "opacity": {
             "signal": "dropdownOpen ? 1 : 0"
           }
