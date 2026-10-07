@@ -54,7 +54,33 @@
       {"events":"@valueItemText:click","update":"kibanaAddFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':selectedField}},{'term':{'changes.value':datum.item.key}}]}}}},'aspen-positions-mtp',selectedField + ': ' + datum.item.key)"}]}
   ],
   "data": [
-    {"name":"raw","url":{"index":"aspen-positions-mtp","body":{"size":0,"aggs":{"changes_nested":{"nested":{"path":"changes"},"aggs":{"fields":{"terms":{"field":"changes.field","size":100},"aggs":{"changed_values":{"terms":{"field":"changes.value","size":100}}}}}}}},"format":{"property":"aggregations.changes_nested.fields.buckets"}},
+    {
+      "name": "raw",
+      "url": {
+        "index": "aspen-positions-mtp",
+        "body": {
+          "size": 0,
+          "aggs": {
+            "changes_nested": {
+              "nested": {"path": "changes"},
+              "aggs": {
+                "fields": {
+                  "terms": {"field": "changes.field", "size": 100},
+                  "aggs": {
+                    "changed_values": {
+                      "terms": {"field": "changes.value", "size": 100}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "format": {
+        "property": "aggregations.changes_nested.fields.buckets"
+      }
+    },
     {"name":"fields","source":"raw","transform":[
       {"type":"window","ops":["row_number"],"as":["row"]},
       {"type":"formula","expr":"datum.row - fieldPage*5","as":"displayRow"}]},
