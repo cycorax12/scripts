@@ -542,13 +542,16 @@
             "value": 30
           },
           "fill": {
-            "value": "white"
+            "value": "#ffffff"
           },
           "stroke": {
-            "value": "#ddd"
+            "value": "#c8c8c8"
           },
           "cursor": {
             "value": "pointer"
+          },
+          "strokeWidth": {
+            "value": 1
           }
         },
         "update": {
@@ -573,15 +576,21 @@
             "value": 13
           },
           "fill": {
-            "value": "black"
+            "value": "#111111"
           },
           "cursor": {
             "value": "pointer"
+          },
+          "fontWeight": {
+            "value": "normal"
+          },
+          "baseline": {
+            "value": "middle"
           }
         },
         "update": {
           "y": {
-            "signal": "65 + ((datum.row - 1) * 30)"
+            "signal": "60 + ((datum.row - 1) * 30)"
           },
           "text": {
             "field": "key"
@@ -607,13 +616,16 @@
             "value": 30
           },
           "fill": {
-            "value": "white"
+            "value": "#ffffff"
           },
           "stroke": {
-            "value": "#ddd"
+            "value": "#c8c8c8"
           },
           "cursor": {
             "value": "pointer"
+          },
+          "strokeWidth": {
+            "value": 1
           }
         },
         "update": {
@@ -638,15 +650,21 @@
             "value": 13
           },
           "fill": {
-            "value": "black"
+            "value": "#111111"
           },
           "cursor": {
             "value": "pointer"
+          },
+          "fontWeight": {
+            "value": "normal"
+          },
+          "baseline": {
+            "value": "middle"
           }
         },
         "update": {
           "y": {
-            "signal": "65 + ((datum.row - 1) * 30)"
+            "signal": "60 + ((datum.row - 1) * 30)"
           },
           "text": {
             "field": "item.key"
