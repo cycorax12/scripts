@@ -1,5 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "padding": 10,
 
   "signals": [
     {
@@ -18,33 +19,53 @@
 
   "data": [
     {
-      "name": "test",
-      "values": [
-        {
-          "field": "processing_status",
-          "value": "Exclude",
-          "count": 100
-        },
-        {
-          "field": "processing_status",
-          "value": "Include",
-          "count": 50
-        },
-        {
-          "field": "box_location",
-          "value": "SCM",
-          "count": 80
-        },
-        {
-          "field": "box_location",
-          "value": "NYC",
-          "count": 30
+      "name": "raw",
+      "url": {
+        "index": "aspen-positions-mtp",
+        "body": {
+          "size": 0,
+          "aggs": {
+            "changes_nested": {
+              "nested": {
+                "path": "changes"
+              },
+              "aggs": {
+                "fields": {
+                  "terms": {
+                    "field": "changes.field",
+                    "size": 100
+                  },
+                  "aggs": {
+                    "changed_values": {
+                      "terms": {
+                        "field": "changes.value",
+                        "size": 100
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
-      ],
+      },
+      "format": {
+        "property": "aggregations.changes_nested.fields.buckets"
+      }
+    },
+
+    {
+      "name": "values",
+      "source": "raw",
       "transform": [
         {
           "type": "filter",
-          "expr": "datum.field === selectedField"
+          "expr": "datum.key === selectedField"
+        },
+        {
+          "type": "flatten",
+          "fields": ["changed_values.buckets"],
+          "as": ["item"]
         }
       ]
     }
@@ -55,18 +76,19 @@
       "name": "x",
       "type": "linear",
       "domain": {
-        "data": "test",
-        "field": "count"
+        "data": "values",
+        "field": "item.doc_count"
       },
       "range": "width",
-      "zero": true
+      "zero": true,
+      "nice": true
     },
     {
       "name": "y",
       "type": "band",
       "domain": {
-        "data": "test",
-        "field": "value"
+        "data": "values",
+        "field": "item.key"
       },
       "range": "height",
       "padding": 0.2
@@ -90,7 +112,7 @@
     {
       "type": "rect",
       "from": {
-        "data": "test"
+        "data": "values"
       },
       "encode": {
         "enter": {
@@ -100,15 +122,18 @@
           },
           "x2": {
             "scale": "x",
-            "field": "count"
+            "field": "item.doc_count"
           },
           "y": {
             "scale": "y",
-            "field": "value"
+            "field": "item.key"
           },
           "height": {
             "scale": "y",
             "band": 1
+          },
+          "tooltip": {
+            "signal": "{'Value': datum.item.key, 'Count': datum.item.doc_count}"
           }
         }
       }
