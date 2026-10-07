@@ -1,9 +1,20 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "padding": 10,
+  "autosize": {
+    "type": "fit",
+    "contains": "padding"
+  },
+  "padding": {
+    "top": 15,
+    "left": 15,
+    "right": 15,
+    "bottom": 15
+  },
 
   "config": {
     "kibana": {
+      "controlsLocation": "top",
+      "controlsDirection": "horizontal",
       "restoreSignalValuesOnRefresh": true
     }
   },
@@ -75,6 +86,12 @@
         {
           "events": "@valueItemText:click",
           "update": "false"
+        },
+        {
+          "events": {
+            "signal": "selectedField"
+          },
+          "update": "false"
         }
       ]
     },
@@ -99,20 +116,25 @@
     {
       "name": "raw",
       "url": {
+        "%context%": true,
         "index": "aspen-positions-mtp",
+
         "body": {
           "size": 0,
+
           "aggs": {
             "changes_nested": {
               "nested": {
                 "path": "changes"
               },
+
               "aggs": {
                 "fields": {
                   "terms": {
                     "field": "changes.field",
                     "size": 100
                   },
+
                   "aggs": {
                     "changed_values": {
                       "terms": {
@@ -136,11 +158,13 @@
     {
       "name": "values",
       "source": "raw",
+
       "transform": [
         {
           "type": "filter",
           "expr": "datum.key === selectedField"
         },
+
         {
           "type": "flatten",
           "fields": [
@@ -150,6 +174,7 @@
             "item"
           ]
         },
+
         {
           "type": "window",
           "ops": [
@@ -166,13 +191,14 @@
   "marks": [
     {
       "type": "text",
+
       "encode": {
         "enter": {
           "x": {
             "value": 10
           },
           "y": {
-            "value": 35
+            "value": 30
           },
           "text": {
             "value": "Changed Value:"
@@ -190,13 +216,14 @@
     {
       "name": "valueSelector",
       "type": "rect",
+
       "encode": {
         "enter": {
           "x": {
-            "value": 120
+            "value": 125
           },
           "y": {
-            "value": 15
+            "value": 8
           },
           "width": {
             "value": 260
@@ -226,13 +253,14 @@
     {
       "name": "valueSelectorText",
       "type": "text",
+
       "encode": {
         "enter": {
           "x": {
-            "value": 130
+            "value": 135
           },
           "y": {
-            "value": 36
+            "value": 29
           },
           "fontSize": {
             "value": 13
@@ -256,19 +284,20 @@
     {
       "name": "valueSelectorArrow",
       "type": "text",
+
       "encode": {
         "enter": {
           "x": {
-            "value": 360
+            "value": 365
           },
           "y": {
-            "value": 36
+            "value": 29
           },
           "text": {
             "value": "▼"
           },
           "fontSize": {
-            "value": 12
+            "value": 11
           },
           "fill": {
             "value": "black"
@@ -283,6 +312,7 @@
     {
       "name": "valueItem",
       "type": "rect",
+
       "from": {
         "data": "values"
       },
@@ -290,10 +320,10 @@
       "encode": {
         "update": {
           "x": {
-            "value": 120
+            "value": 125
           },
           "y": {
-            "signal": "52 + ((datum.row - 1) * 30)"
+            "signal": "44 + ((datum.row - 1) * 30)"
           },
           "width": {
             "value": 260
@@ -320,6 +350,7 @@
     {
       "name": "valueItemText",
       "type": "text",
+
       "from": {
         "data": "values"
       },
@@ -327,10 +358,10 @@
       "encode": {
         "update": {
           "x": {
-            "value": 130
+            "value": 135
           },
           "y": {
-            "signal": "72 + ((datum.row - 1) * 30)"
+            "signal": "64 + ((datum.row - 1) * 30)"
           },
           "text": {
             "field": "item.key"
