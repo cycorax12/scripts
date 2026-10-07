@@ -11,7 +11,16 @@
         "name": "Changed Field: ",
         "options": [
           "processing_status",
-          "box_location"
+          "box_location",
+          "manual_adjustment",
+          "dtc_tracking_marker",
+          "comp_claim_type",
+          "contra_required",
+          "special_bargain_condition",
+          "qsl_marker",
+          "swt_flag",
+          "swt_flag_manual",
+          "franking"
         ]
       }
     }
@@ -73,6 +82,17 @@
 
   "scales": [
     {
+      "name": "y",
+      "type": "band",
+      "domain": {
+        "data": "values",
+        "field": "item.key"
+      },
+      "range": "height",
+      "padding": 0.15
+    },
+
+    {
       "name": "x",
       "type": "linear",
       "domain": {
@@ -82,58 +102,58 @@
       "range": "width",
       "zero": true,
       "nice": true
-    },
-    {
-      "name": "y",
-      "type": "band",
-      "domain": {
-        "data": "values",
-        "field": "item.key"
-      },
-      "range": "height",
-      "padding": 0.2
     }
   ],
 
   "axes": [
     {
-      "scale": "x",
-      "orient": "bottom",
-      "title": "Count"
-    },
-    {
       "scale": "y",
       "orient": "left",
       "title": "Changed Value"
+    },
+    {
+      "scale": "x",
+      "orient": "bottom",
+      "title": "Count"
     }
   ],
 
   "marks": [
     {
+      "name": "valueOption",
       "type": "rect",
       "from": {
         "data": "values"
       },
+
       "encode": {
         "enter": {
-          "x": {
-            "scale": "x",
-            "value": 0
-          },
-          "x2": {
-            "scale": "x",
-            "field": "item.doc_count"
-          },
           "y": {
             "scale": "y",
             "field": "item.key"
           },
+
           "height": {
             "scale": "y",
             "band": 1
           },
+
+          "x": {
+            "scale": "x",
+            "value": 0
+          },
+
+          "x2": {
+            "scale": "x",
+            "field": "item.doc_count"
+          },
+
+          "cursor": {
+            "value": "pointer"
+          },
+
           "tooltip": {
-            "signal": "{'Value': datum.item.key, 'Count': datum.item.doc_count}"
+            "signal": "{'Changed Field': selectedField, 'Changed Value': datum.item.key, 'Count': datum.item.doc_count}"
           }
         }
       }
