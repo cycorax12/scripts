@@ -44,48 +44,66 @@
       ]
     },
     {
-      "name": "openList",
-      "value": "none",
+      "name": "fieldDropdownOpen",
+      "value": false,
       "on": [
         {
           "events": "@fieldSelector:click",
-          "update": "openList == 'field' ? 'none' : 'field'"
+          "update": "!fieldDropdownOpen"
         },
         {
           "events": "@fieldSelectorText:click",
-          "update": "openList == 'field' ? 'none' : 'field'"
+          "update": "!fieldDropdownOpen"
         },
         {
-          "events": "@fieldArrow:click",
-          "update": "openList == 'field' ? 'none' : 'field'"
-        },
-        {
-          "events": "@valueSelector:click",
-          "update": "selectedField != 'Select field' ? (openList == 'value' ? 'none' : 'value') : 'none'"
-        },
-        {
-          "events": "@valueSelectorText:click",
-          "update": "selectedField != 'Select field' ? (openList == 'value' ? 'none' : 'value') : 'none'"
-        },
-        {
-          "events": "@valueArrow:click",
-          "update": "selectedField != 'Select field' ? (openList == 'value' ? 'none' : 'value') : 'none'"
+          "events": "@fieldSelectorArrow:click",
+          "update": "!fieldDropdownOpen"
         },
         {
           "events": "@fieldItem:click",
-          "update": "'none'"
+          "update": "false"
         },
         {
           "events": "@fieldItemText:click",
-          "update": "'none'"
+          "update": "false"
+        },
+        {
+          "events": "@valueSelector:click",
+          "update": "false"
+        }
+      ]
+    },
+    {
+      "name": "valueDropdownOpen",
+      "value": false,
+      "on": [
+        {
+          "events": "@valueSelector:click",
+          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
+        },
+        {
+          "events": "@valueSelectorText:click",
+          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
+        },
+        {
+          "events": "@valueSelectorArrow:click",
+          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
         },
         {
           "events": "@valueItem:click",
-          "update": "'none'"
+          "update": "false"
         },
         {
           "events": "@valueItemText:click",
-          "update": "'none'"
+          "update": "false"
+        },
+        {
+          "events": "@fieldSelector:click",
+          "update": "false"
+        },
+        {
+          "events": "@fieldItem:click",
+          "update": "false"
         }
       ]
     },
@@ -126,16 +144,16 @@
       ]
     },
     {
-      "name": "removePreviousFieldFilter",
+      "name": "removePreviousOnField",
       "value": null,
       "on": [
         {
           "events": "@fieldItem:click",
-          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')) : null"
+          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')) : null"
         },
         {
           "events": "@fieldItemText:click",
-          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')) : null"
+          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')) : null"
         }
       ]
     },
@@ -145,11 +163,11 @@
       "on": [
         {
           "events": "@fieldItem:click",
-          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'term':{'changes.field':datum.key}}}},'aspen-positions-mtp',datum.key)"
+          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': datum.key}}}}, 'aspen-positions-mtp', datum.key)"
         },
         {
           "events": "@fieldItemText:click",
-          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'term':{'changes.field':datum.key}}}},'aspen-positions-mtp',datum.key)"
+          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': datum.key}}}}, 'aspen-positions-mtp', datum.key)"
         }
       ]
     },
@@ -159,11 +177,11 @@
       "on": [
         {
           "events": "@valueItem:click",
-          "update": "activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')"
+          "update": "activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')"
         },
         {
           "events": "@valueItemText:click",
-          "update": "activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')"
+          "update": "activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')"
         }
       ]
     },
@@ -173,11 +191,11 @@
       "on": [
         {
           "events": "@valueItem:click",
-          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':selectedField}},{'term':{'changes.value':datum.item.key}}]}}}},'aspen-positions-mtp',selectedField + ': ' + datum.item.key)"
+          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
         },
         {
           "events": "@valueItemText:click",
-          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':selectedField}},{'term':{'changes.value':datum.item.key}}]}}}},'aspen-positions-mtp',selectedField + ': ' + datum.item.key)"
+          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
         }
       ]
     }
@@ -230,10 +248,16 @@
           "as": [
             "row"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "name": "fieldOptions",
+      "source": "fields",
+      "transform": [
         {
           "type": "filter",
-          "expr": "datum.row <= 5"
+          "expr": "fieldDropdownOpen"
         }
       ]
     },
@@ -243,7 +267,7 @@
       "transform": [
         {
           "type": "filter",
-          "expr": "datum.key === selectedField"
+          "expr": "selectedField != 'Select field' && datum.key === selectedField"
         },
         {
           "type": "flatten",
@@ -262,10 +286,16 @@
           "as": [
             "row"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "name": "valueOptions",
+      "source": "values",
+      "transform": [
         {
           "type": "filter",
-          "expr": "datum.row <= 5"
+          "expr": "valueDropdownOpen"
         }
       ]
     }
@@ -279,7 +309,7 @@
             "value": 10
           },
           "y": {
-            "value": 28
+            "value": 29
           },
           "text": {
             "value": "Changed Field:"
@@ -310,9 +340,6 @@
           "height": {
             "value": 32
           },
-          "fill": {
-            "value": "white"
-          },
           "stroke": {
             "value": "#888"
           },
@@ -322,6 +349,11 @@
           "cursor": {
             "value": "pointer"
           }
+        },
+        "update": {
+          "fill": {
+            "value": "white"
+          }
         }
       }
     },
@@ -329,27 +361,32 @@
       "name": "fieldSelectorText",
       "type": "text",
       "encode": {
-        "update": {
+        "enter": {
           "x": {
             "value": 125
           },
           "y": {
             "value": 28
           },
-          "text": {
-            "signal": "selectedField"
-          },
           "fontSize": {
             "value": 13
           },
+          "fill": {
+            "value": "black"
+          },
           "cursor": {
             "value": "pointer"
+          }
+        },
+        "update": {
+          "text": {
+            "signal": "selectedField"
           }
         }
       }
     },
     {
-      "name": "fieldArrow",
+      "name": "fieldSelectorArrow",
       "type": "text",
       "encode": {
         "enter": {
@@ -365,6 +402,9 @@
           "fontSize": {
             "value": 11
           },
+          "fill": {
+            "value": "black"
+          },
           "cursor": {
             "value": "pointer"
           }
@@ -376,10 +416,10 @@
       "encode": {
         "enter": {
           "x": {
-            "value": 365
+            "value": 370
           },
           "y": {
-            "value": 28
+            "value": 29
           },
           "text": {
             "value": "Changed Value:"
@@ -397,9 +437,9 @@
       "name": "valueSelector",
       "type": "rect",
       "encode": {
-        "update": {
+        "enter": {
           "x": {
-            "value": 480
+            "value": 485
           },
           "y": {
             "value": 7
@@ -410,9 +450,6 @@
           "height": {
             "value": 32
           },
-          "fill": {
-            "value": "white"
-          },
           "stroke": {
             "value": "#888"
           },
@@ -421,6 +458,11 @@
           },
           "cursor": {
             "value": "pointer"
+          }
+        },
+        "update": {
+          "fill": {
+            "value": "white"
           },
           "opacity": {
             "signal": "selectedField == 'Select field' ? 0.6 : 1"
@@ -432,32 +474,37 @@
       "name": "valueSelectorText",
       "type": "text",
       "encode": {
-        "update": {
+        "enter": {
           "x": {
-            "value": 490
+            "value": 495
           },
           "y": {
             "value": 28
           },
-          "text": {
-            "signal": "selectedField == 'Select field' ? 'Select field first' : selectedValue"
-          },
           "fontSize": {
             "value": 13
           },
+          "fill": {
+            "value": "black"
+          },
           "cursor": {
             "value": "pointer"
+          }
+        },
+        "update": {
+          "text": {
+            "signal": "selectedField == 'Select field' ? 'Select field first' : selectedValue"
           }
         }
       }
     },
     {
-      "name": "valueArrow",
+      "name": "valueSelectorArrow",
       "type": "text",
       "encode": {
         "enter": {
           "x": {
-            "value": 680
+            "value": 685
           },
           "y": {
             "value": 28
@@ -467,6 +514,9 @@
           },
           "fontSize": {
             "value": 11
+          },
+          "fill": {
+            "value": "black"
           },
           "cursor": {
             "value": "pointer"
@@ -478,21 +528,18 @@
       "name": "fieldItem",
       "type": "rect",
       "from": {
-        "data": "fields"
+        "data": "fieldOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {
             "value": 115
-          },
-          "y": {
-            "signal": "45 + ((datum.row-1)*30)"
           },
           "width": {
             "value": 220
           },
           "height": {
-            "value": 29
+            "value": 30
           },
           "fill": {
             "value": "white"
@@ -502,9 +549,11 @@
           },
           "cursor": {
             "value": "pointer"
-          },
-          "opacity": {
-            "signal": "openList == 'field' ? 1 : 0"
+          }
+        },
+        "update": {
+          "y": {
+            "signal": "45 + ((datum.row - 1) * 30)"
           }
         }
       }
@@ -513,27 +562,29 @@
       "name": "fieldItemText",
       "type": "text",
       "from": {
-        "data": "fields"
+        "data": "fieldOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {
             "value": 125
-          },
-          "y": {
-            "signal": "65 + ((datum.row-1)*30)"
-          },
-          "text": {
-            "field": "key"
           },
           "fontSize": {
             "value": 13
           },
+          "fill": {
+            "value": "black"
+          },
           "cursor": {
             "value": "pointer"
+          }
+        },
+        "update": {
+          "y": {
+            "signal": "65 + ((datum.row - 1) * 30)"
           },
-          "opacity": {
-            "signal": "openList == 'field' ? 1 : 0"
+          "text": {
+            "field": "key"
           }
         }
       }
@@ -542,21 +593,18 @@
       "name": "valueItem",
       "type": "rect",
       "from": {
-        "data": "values"
+        "data": "valueOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {
-            "value": 480
-          },
-          "y": {
-            "signal": "45 + ((datum.row-1)*30)"
+            "value": 485
           },
           "width": {
             "value": 220
           },
           "height": {
-            "value": 29
+            "value": 30
           },
           "fill": {
             "value": "white"
@@ -566,9 +614,11 @@
           },
           "cursor": {
             "value": "pointer"
-          },
-          "opacity": {
-            "signal": "openList == 'value' ? 1 : 0"
+          }
+        },
+        "update": {
+          "y": {
+            "signal": "45 + ((datum.row - 1) * 30)"
           }
         }
       }
@@ -577,27 +627,29 @@
       "name": "valueItemText",
       "type": "text",
       "from": {
-        "data": "values"
+        "data": "valueOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {
-            "value": 490
-          },
-          "y": {
-            "signal": "65 + ((datum.row-1)*30)"
-          },
-          "text": {
-            "field": "item.key"
+            "value": 495
           },
           "fontSize": {
             "value": 13
           },
+          "fill": {
+            "value": "black"
+          },
           "cursor": {
             "value": "pointer"
+          }
+        },
+        "update": {
+          "y": {
+            "signal": "65 + ((datum.row - 1) * 30)"
           },
-          "opacity": {
-            "signal": "openList == 'value' ? 1 : 0"
+          "text": {
+            "field": "item.key"
           }
         }
       }
