@@ -74,6 +74,14 @@
         {
           "events": "@valueSelector:click",
           "update": "false"
+        },
+        {
+          "events": "@valueSelectorText:click",
+          "update": "false"
+        },
+        {
+          "events": "@valueSelectorArrow:click",
+          "update": "false"
         }
       ]
     },
@@ -104,6 +112,14 @@
         },
         {
           "events": "@fieldSelector:click",
+          "update": "false"
+        },
+        {
+          "events": "@fieldSelectorText:click",
+          "update": "false"
+        },
+        {
+          "events": "@fieldSelectorArrow:click",
           "update": "false"
         },
         {
@@ -432,14 +448,9 @@
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {
-            "signal": "fieldDropdownOpen ? 'pointer' : 'default'"
-          },
+          "cursor": {"value": "pointer"},
           "opacity": {
             "signal": "fieldDropdownOpen ? 1 : 0"
-          },
-          "interactive": {
-            "signal": "fieldDropdownOpen"
           }
         }
       }
@@ -460,14 +471,9 @@
           "text": {"field": "key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {
-            "signal": "fieldDropdownOpen ? 'pointer' : 'default'"
-          },
+          "cursor": {"value": "pointer"},
           "opacity": {
             "signal": "fieldDropdownOpen ? 1 : 0"
-          },
-          "interactive": {
-            "signal": "fieldDropdownOpen"
           }
         }
       }
@@ -489,14 +495,9 @@
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {
-            "signal": "valueDropdownOpen ? 'pointer' : 'default'"
-          },
+          "cursor": {"value": "pointer"},
           "opacity": {
             "signal": "valueDropdownOpen ? 1 : 0"
-          },
-          "interactive": {
-            "signal": "valueDropdownOpen"
           }
         }
       }
@@ -517,14 +518,9 @@
           "text": {"field": "item.key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {
-            "signal": "valueDropdownOpen ? 'pointer' : 'default'"
-          },
+          "cursor": {"value": "pointer"},
           "opacity": {
             "signal": "valueDropdownOpen ? 1 : 0"
-          },
-          "interactive": {
-            "signal": "valueDropdownOpen"
           }
         }
       }
