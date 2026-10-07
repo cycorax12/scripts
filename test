@@ -12,10 +12,19 @@
               "path": "changes"
             },
             "aggs": {
-              "fields": {
-                "terms": {
-                  "field": "changes.field",
-                  "size": 50
+              "selected_field": {
+                "filter": {
+                  "term": {
+                    "changes.field": "processing_status"
+                  }
+                },
+                "aggs": {
+                  "values": {
+                    "terms": {
+                      "field": "changes.value",
+                      "size": 100
+                    }
+                  }
                 }
               }
             }
@@ -24,17 +33,20 @@
       }
     },
     "format": {
-      "property": "aggregations.changes.fields.buckets"
+      "property": "aggregations.changes.selected_field.values.buckets"
     }
   },
 
-  "mark": "bar",
+  "mark": {
+    "type": "bar",
+    "tooltip": true
+  },
 
   "encoding": {
     "y": {
       "field": "key",
       "type": "nominal",
-      "title": "Changed Field"
+      "title": "Processing Status"
     },
     "x": {
       "field": "doc_count",
