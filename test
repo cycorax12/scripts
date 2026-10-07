@@ -89,12 +89,32 @@
 
     {
       "name": "activeField",
-      "value": ""
+      "value": "",
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "selectedField"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "selectedField"
+        }
+      ]
     },
 
     {
       "name": "activeValue",
-      "value": ""
+      "value": "",
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "datum.item.key"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "datum.item.key"
+        }
+      ]
     },
 
     {
@@ -111,7 +131,7 @@
     },
 
     {
-      "name": "removeOldFilterOnValueClick",
+      "name": "removeOldFilter",
       "value": null,
       "on": [
         {
@@ -136,42 +156,6 @@
         {
           "events": "@valueItemText:click",
           "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
-        }
-      ]
-    },
-
-    {
-      "name": "activeField",
-      "value": "",
-      "on": [
-        {
-          "events": "@valueItem:click",
-          "update": "selectedField"
-        },
-        {
-          "events": "@valueItemText:click",
-          "update": "selectedField"
-        }
-      ]
-    },
-
-    {
-      "name": "activeValue",
-      "value": "",
-      "on": [
-        {
-          "events": "@valueItem:click",
-          "update": "datum.item.key"
-        },
-        {
-          "events": "@valueItemText:click",
-          "update": "datum.item.key"
-        },
-        {
-          "events": {
-            "signal": "selectedField"
-          },
-          "update": "''"
         }
       ]
     }
