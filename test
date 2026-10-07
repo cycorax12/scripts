@@ -74,14 +74,6 @@
         {
           "events": "@valueSelector:click",
           "update": "false"
-        },
-        {
-          "events": "@valueSelectorText:click",
-          "update": "false"
-        },
-        {
-          "events": "@valueSelectorArrow:click",
-          "update": "false"
         }
       ]
     },
@@ -115,19 +107,7 @@
           "update": "false"
         },
         {
-          "events": "@fieldSelectorText:click",
-          "update": "false"
-        },
-        {
-          "events": "@fieldSelectorArrow:click",
-          "update": "false"
-        },
-        {
           "events": "@fieldItem:click",
-          "update": "false"
-        },
-        {
-          "events": "@fieldItemText:click",
           "update": "false"
         }
       ]
@@ -266,12 +246,28 @@
       },
       "format": {
         "property": "aggregations.changes_nested.fields.buckets"
-      },
+      }
+    },
+
+    {
+      "name": "fields",
+      "source": "raw",
       "transform": [
         {
           "type": "window",
           "ops": ["row_number"],
-          "as": ["fieldRow"]
+          "as": ["row"]
+        }
+      ]
+    },
+
+    {
+      "name": "fieldOptions",
+      "source": "fields",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "fieldDropdownOpen"
         }
       ]
     },
@@ -292,7 +288,18 @@
         {
           "type": "window",
           "ops": ["row_number"],
-          "as": ["valueRow"]
+          "as": ["row"]
+        }
+      ]
+    },
+
+    {
+      "name": "valueOptions",
+      "source": "values",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "valueDropdownOpen"
         }
       ]
     }
@@ -436,21 +443,20 @@
       "name": "fieldItem",
       "type": "rect",
       "from": {
-        "data": "raw"
+        "data": "fieldOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {"value": 115},
-          "y": {
-            "signal": "45 + ((datum.fieldRow - 1) * 30)"
-          },
           "width": {"value": 220},
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "fieldDropdownOpen ? 1 : 0"
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {
+            "signal": "45 + ((datum.row - 1) * 30)"
           }
         }
       }
@@ -460,21 +466,20 @@
       "name": "fieldItemText",
       "type": "text",
       "from": {
-        "data": "raw"
+        "data": "fieldOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {"value": 125},
-          "y": {
-            "signal": "65 + ((datum.fieldRow - 1) * 30)"
-          },
-          "text": {"field": "key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "fieldDropdownOpen ? 1 : 0"
-          }
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {
+            "signal": "65 + ((datum.row - 1) * 30)"
+          },
+          "text": {"field": "key"}
         }
       }
     },
@@ -483,21 +488,20 @@
       "name": "valueItem",
       "type": "rect",
       "from": {
-        "data": "values"
+        "data": "valueOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {"value": 485},
-          "y": {
-            "signal": "45 + ((datum.valueRow - 1) * 30)"
-          },
           "width": {"value": 220},
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "valueDropdownOpen ? 1 : 0"
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {
+            "signal": "45 + ((datum.row - 1) * 30)"
           }
         }
       }
@@ -507,21 +511,20 @@
       "name": "valueItemText",
       "type": "text",
       "from": {
-        "data": "values"
+        "data": "valueOptions"
       },
       "encode": {
-        "update": {
+        "enter": {
           "x": {"value": 495},
-          "y": {
-            "signal": "65 + ((datum.valueRow - 1) * 30)"
-          },
-          "text": {"field": "item.key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "valueDropdownOpen ? 1 : 0"
-          }
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "y": {
+            "signal": "65 + ((datum.row - 1) * 30)"
+          },
+          "text": {"field": "item.key"}
         }
       }
     }
