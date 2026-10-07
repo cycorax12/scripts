@@ -237,31 +237,6 @@
       }
     },
     {
-      "name": "fields",
-      "source": "raw",
-      "transform": [
-        {
-          "type": "window",
-          "ops": [
-            "row_number"
-          ],
-          "as": [
-            "row"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "fieldOptions",
-      "source": "fields",
-      "transform": [
-        {
-          "type": "filter",
-          "expr": "fieldDropdownOpen"
-        }
-      ]
-    },
-    {
       "name": "values",
       "source": "raw",
       "transform": [
@@ -284,18 +259,23 @@
             "row_number"
           ],
           "as": [
-            "row"
+            "valueRow"
           ]
         }
       ]
     },
     {
-      "name": "valueOptions",
-      "source": "values",
+      "name": "fields",
+      "source": "raw",
       "transform": [
         {
-          "type": "filter",
-          "expr": "valueDropdownOpen"
+          "type": "window",
+          "ops": [
+            "row_number"
+          ],
+          "as": [
+            "fieldRow"
+          ]
         }
       ]
     }
@@ -528,12 +508,15 @@
       "name": "fieldItem",
       "type": "rect",
       "from": {
-        "data": "fieldOptions"
+        "data": "fields"
       },
       "encode": {
-        "enter": {
+        "update": {
           "x": {
             "value": 115
+          },
+          "y": {
+            "signal": "45 + ((datum.fieldRow - 1) * 30)"
           },
           "width": {
             "value": 220
@@ -542,21 +525,16 @@
             "value": 30
           },
           "fill": {
-            "value": "#ffffff"
+            "value": "white"
           },
           "stroke": {
-            "value": "#c8c8c8"
+            "value": "#ddd"
           },
           "cursor": {
             "value": "pointer"
           },
-          "strokeWidth": {
-            "value": 1
-          }
-        },
-        "update": {
-          "y": {
-            "signal": "45 + ((datum.row - 1) * 30)"
+          "opacity": {
+            "signal": "fieldDropdownOpen ? 1 : 0"
           }
         }
       }
@@ -565,35 +543,30 @@
       "name": "fieldItemText",
       "type": "text",
       "from": {
-        "data": "fieldOptions"
+        "data": "fields"
       },
       "encode": {
-        "enter": {
+        "update": {
           "x": {
             "value": 125
+          },
+          "y": {
+            "signal": "65 + ((datum.fieldRow - 1) * 30)"
+          },
+          "text": {
+            "field": "key"
           },
           "fontSize": {
             "value": 13
           },
           "fill": {
-            "value": "#111111"
+            "value": "black"
           },
           "cursor": {
             "value": "pointer"
           },
-          "fontWeight": {
-            "value": "normal"
-          },
-          "baseline": {
-            "value": "middle"
-          }
-        },
-        "update": {
-          "y": {
-            "signal": "60 + ((datum.row - 1) * 30)"
-          },
-          "text": {
-            "field": "key"
+          "opacity": {
+            "signal": "fieldDropdownOpen ? 1 : 0"
           }
         }
       }
@@ -602,12 +575,15 @@
       "name": "valueItem",
       "type": "rect",
       "from": {
-        "data": "valueOptions"
+        "data": "values"
       },
       "encode": {
-        "enter": {
+        "update": {
           "x": {
             "value": 485
+          },
+          "y": {
+            "signal": "45 + ((datum.valueRow - 1) * 30)"
           },
           "width": {
             "value": 220
@@ -616,21 +592,16 @@
             "value": 30
           },
           "fill": {
-            "value": "#ffffff"
+            "value": "white"
           },
           "stroke": {
-            "value": "#c8c8c8"
+            "value": "#ddd"
           },
           "cursor": {
             "value": "pointer"
           },
-          "strokeWidth": {
-            "value": 1
-          }
-        },
-        "update": {
-          "y": {
-            "signal": "45 + ((datum.row - 1) * 30)"
+          "opacity": {
+            "signal": "valueDropdownOpen ? 1 : 0"
           }
         }
       }
@@ -639,35 +610,30 @@
       "name": "valueItemText",
       "type": "text",
       "from": {
-        "data": "valueOptions"
+        "data": "values"
       },
       "encode": {
-        "enter": {
+        "update": {
           "x": {
             "value": 495
+          },
+          "y": {
+            "signal": "65 + ((datum.valueRow - 1) * 30)"
+          },
+          "text": {
+            "field": "item.key"
           },
           "fontSize": {
             "value": 13
           },
           "fill": {
-            "value": "#111111"
+            "value": "black"
           },
           "cursor": {
             "value": "pointer"
           },
-          "fontWeight": {
-            "value": "normal"
-          },
-          "baseline": {
-            "value": "middle"
-          }
-        },
-        "update": {
-          "y": {
-            "signal": "60 + ((datum.row - 1) * 30)"
-          },
-          "text": {
-            "field": "item.key"
+          "opacity": {
+            "signal": "valueDropdownOpen ? 1 : 0"
           }
         }
       }
