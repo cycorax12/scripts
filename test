@@ -70,6 +70,10 @@
         {
           "events": "@fieldItemText:click",
           "update": "false"
+        },
+        {
+          "events": "@valueSelector:click",
+          "update": "false"
         }
       ]
     },
@@ -96,6 +100,10 @@
         },
         {
           "events": "@valueItemText:click",
+          "update": "false"
+        },
+        {
+          "events": "@fieldSelector:click",
           "update": "false"
         },
         {
@@ -178,7 +186,7 @@
     },
 
     {
-      "name": "removeFieldFilterForValue",
+      "name": "removeBeforeValue",
       "value": null,
       "on": [
         {
@@ -280,7 +288,7 @@
       "encode": {
         "enter": {
           "x": {"value": 10},
-          "y": {"value": 30},
+          "y": {"value": 29},
           "text": {"value": "Changed Field:"},
           "fontSize": {"value": 13},
           "fontWeight": {"value": "bold"}
@@ -293,9 +301,9 @@
       "type": "rect",
       "encode": {
         "enter": {
-          "x": {"value": 125},
-          "y": {"value": 8},
-          "width": {"value": 260},
+          "x": {"value": 115},
+          "y": {"value": 7},
+          "width": {"value": 220},
           "height": {"value": 32},
           "stroke": {"value": "#888"},
           "cornerRadius": {"value": 3},
@@ -312,8 +320,8 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 135},
-          "y": {"value": 29},
+          "x": {"value": 125},
+          "y": {"value": 28},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
           "cursor": {"value": "pointer"}
@@ -329,8 +337,8 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 365},
-          "y": {"value": 29},
+          "x": {"value": 315},
+          "y": {"value": 28},
           "text": {"value": "▼"},
           "fontSize": {"value": 11},
           "fill": {"value": "black"},
@@ -343,8 +351,8 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 10},
-          "y": {"value": 78},
+          "x": {"value": 370},
+          "y": {"value": 29},
           "text": {"value": "Changed Value:"},
           "fontSize": {"value": 13},
           "fontWeight": {"value": "bold"}
@@ -357,9 +365,9 @@
       "type": "rect",
       "encode": {
         "enter": {
-          "x": {"value": 125},
-          "y": {"value": 56},
-          "width": {"value": 260},
+          "x": {"value": 485},
+          "y": {"value": 7},
+          "width": {"value": 220},
           "height": {"value": 32},
           "stroke": {"value": "#888"},
           "cornerRadius": {"value": 3},
@@ -379,8 +387,8 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 135},
-          "y": {"value": 77},
+          "x": {"value": 495},
+          "y": {"value": 28},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
           "cursor": {"value": "pointer"}
@@ -398,8 +406,8 @@
       "type": "text",
       "encode": {
         "enter": {
-          "x": {"value": 365},
-          "y": {"value": 77},
+          "x": {"value": 685},
+          "y": {"value": 28},
           "text": {"value": "▼"},
           "fontSize": {"value": 11},
           "fill": {"value": "black"},
@@ -416,17 +424,22 @@
       },
       "encode": {
         "update": {
-          "x": {"value": 125},
+          "x": {"value": 115},
           "y": {
-            "signal": "42 + ((datum.fieldRow - 1) * 30)"
+            "signal": "45 + ((datum.fieldRow - 1) * 30)"
           },
-          "width": {"value": 260},
+          "width": {"value": 220},
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"},
+          "cursor": {
+            "signal": "fieldDropdownOpen ? 'pointer' : 'default'"
+          },
           "opacity": {
             "signal": "fieldDropdownOpen ? 1 : 0"
+          },
+          "interactive": {
+            "signal": "fieldDropdownOpen"
           }
         }
       }
@@ -440,16 +453,21 @@
       },
       "encode": {
         "update": {
-          "x": {"value": 135},
+          "x": {"value": 125},
           "y": {
-            "signal": "62 + ((datum.fieldRow - 1) * 30)"
+            "signal": "65 + ((datum.fieldRow - 1) * 30)"
           },
           "text": {"field": "key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {"value": "pointer"},
+          "cursor": {
+            "signal": "fieldDropdownOpen ? 'pointer' : 'default'"
+          },
           "opacity": {
             "signal": "fieldDropdownOpen ? 1 : 0"
+          },
+          "interactive": {
+            "signal": "fieldDropdownOpen"
           }
         }
       }
@@ -463,17 +481,22 @@
       },
       "encode": {
         "update": {
-          "x": {"value": 125},
+          "x": {"value": 485},
           "y": {
-            "signal": "90 + ((datum.valueRow - 1) * 30)"
+            "signal": "45 + ((datum.valueRow - 1) * 30)"
           },
-          "width": {"value": 260},
+          "width": {"value": 220},
           "height": {"value": 30},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"},
+          "cursor": {
+            "signal": "valueDropdownOpen ? 'pointer' : 'default'"
+          },
           "opacity": {
             "signal": "valueDropdownOpen ? 1 : 0"
+          },
+          "interactive": {
+            "signal": "valueDropdownOpen"
           }
         }
       }
@@ -487,16 +510,21 @@
       },
       "encode": {
         "update": {
-          "x": {"value": 135},
+          "x": {"value": 495},
           "y": {
-            "signal": "110 + ((datum.valueRow - 1) * 30)"
+            "signal": "65 + ((datum.valueRow - 1) * 30)"
           },
           "text": {"field": "item.key"},
           "fontSize": {"value": 13},
           "fill": {"value": "black"},
-          "cursor": {"value": "pointer"},
+          "cursor": {
+            "signal": "valueDropdownOpen ? 'pointer' : 'default'"
+          },
           "opacity": {
             "signal": "valueDropdownOpen ? 1 : 0"
+          },
+          "interactive": {
+            "signal": "valueDropdownOpen"
           }
         }
       }
