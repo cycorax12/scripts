@@ -1,15 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "autosize": {
-    "type": "fit",
-    "contains": "padding"
-  },
-  "padding": {
-    "top": 15,
-    "left": 15,
-    "right": 15,
-    "bottom": 15
-  },
+  "padding": 10,
 
   "config": {
     "kibana": {
@@ -64,6 +55,16 @@
     },
 
     {
+      "name": "previousField",
+      "value": ""
+    },
+
+    {
+      "name": "previousValue",
+      "value": ""
+    },
+
+    {
       "name": "dropdownOpen",
       "value": false,
       "on": [
@@ -97,6 +98,34 @@
     },
 
     {
+      "name": "clearOldFilter",
+      "value": null,
+      "on": [
+        {
+          "events": {
+            "signal": "selectedField"
+          },
+          "update": "previousValue !== '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': previousField}}, {'term': {'changes.value': previousValue}}]}}}}, 'aspen-positions-mtp') : null"
+        }
+      ]
+    },
+
+    {
+      "name": "replaceDashboardFilter",
+      "value": null,
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "previousValue !== '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': previousField}}, {'term': {'changes.value': previousValue}}]}}}}, 'aspen-positions-mtp') : null"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "previousValue !== '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': previousField}}, {'term': {'changes.value': previousValue}}]}}}}, 'aspen-positions-mtp') : null"
+        }
+      ]
+    },
+
+    {
       "name": "applyDashboardFilter",
       "value": null,
       "on": [
@@ -109,6 +138,36 @@
           "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
         }
       ]
+    },
+
+    {
+      "name": "rememberField",
+      "value": null,
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "previousField = selectedField"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "previousField = selectedField"
+        }
+      ]
+    },
+
+    {
+      "name": "rememberValue",
+      "value": null,
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "previousValue = datum.item.key"
+        },
+        {
+          "events": "@valueItemText:click",
+          "update": "previousValue = datum.item.key"
+        }
+      ]
     }
   ],
 
@@ -118,23 +177,19 @@
       "url": {
         "%context%": true,
         "index": "aspen-positions-mtp",
-
         "body": {
           "size": 0,
-
           "aggs": {
             "changes_nested": {
               "nested": {
                 "path": "changes"
               },
-
               "aggs": {
                 "fields": {
                   "terms": {
                     "field": "changes.field",
                     "size": 100
                   },
-
                   "aggs": {
                     "changed_values": {
                       "terms": {
@@ -158,13 +213,11 @@
     {
       "name": "values",
       "source": "raw",
-
       "transform": [
         {
           "type": "filter",
           "expr": "datum.key === selectedField"
         },
-
         {
           "type": "flatten",
           "fields": [
@@ -174,7 +227,6 @@
             "item"
           ]
         },
-
         {
           "type": "window",
           "ops": [
@@ -191,7 +243,6 @@
   "marks": [
     {
       "type": "text",
-
       "encode": {
         "enter": {
           "x": {
@@ -216,7 +267,6 @@
     {
       "name": "valueSelector",
       "type": "rect",
-
       "encode": {
         "enter": {
           "x": {
@@ -241,7 +291,6 @@
             "value": "pointer"
           }
         },
-
         "update": {
           "fill": {
             "value": "white"
@@ -253,7 +302,6 @@
     {
       "name": "valueSelectorText",
       "type": "text",
-
       "encode": {
         "enter": {
           "x": {
@@ -272,7 +320,6 @@
             "value": "pointer"
           }
         },
-
         "update": {
           "text": {
             "signal": "selectedValue"
@@ -284,7 +331,6 @@
     {
       "name": "valueSelectorArrow",
       "type": "text",
-
       "encode": {
         "enter": {
           "x": {
@@ -312,11 +358,9 @@
     {
       "name": "valueItem",
       "type": "rect",
-
       "from": {
         "data": "values"
       },
-
       "encode": {
         "update": {
           "x": {
@@ -350,11 +394,9 @@
     {
       "name": "valueItemText",
       "type": "text",
-
       "from": {
         "data": "values"
       },
-
       "encode": {
         "update": {
           "x": {
