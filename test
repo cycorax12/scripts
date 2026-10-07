@@ -1,28 +1,46 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "padding": 10,
 
-  "data": {
-    "url": {
-      "index": "aspen-positions-mtp",
-      "body": {
-        "size": 0,
-        "aggs": {
-          "changes": {
-            "nested": {
-              "path": "changes"
-            },
-            "aggs": {
-              "selected_field": {
-                "filter": {
-                  "term": {
-                    "changes.field": "processing_status"
-                  }
-                },
-                "aggs": {
-                  "values": {
-                    "terms": {
-                      "field": "changes.value",
-                      "size": 100
+  "signals": [
+    {
+      "name": "selectedField",
+      "value": "processing_status",
+      "bind": {
+        "input": "select",
+        "name": "Changed Field: ",
+        "options": [
+          "processing_status",
+          "box_location"
+        ]
+      }
+    }
+  ],
+
+  "data": [
+    {
+      "name": "values",
+      "url": {
+        "index": "aspen-positions-mtp",
+        "body": {
+          "size": 0,
+          "aggs": {
+            "changes_nested": {
+              "nested": {
+                "path": "changes"
+              },
+              "aggs": {
+                "fields": {
+                  "terms": {
+                    "field": "changes.field",
+                    "size": 100
+                  },
+                  "aggs": {
+                    "values": {
+                      "terms": {
+                        "field": "changes.value",
+                        "size": 100
+                      }
                     }
                   }
                 }
@@ -30,28 +48,87 @@
             }
           }
         }
-      }
-    },
-    "format": {
-      "property": "aggregations.changes.selected_field.values.buckets"
+      },
+      "format": {
+        "property": "aggregations.changes_nested.fields.buckets"
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.key === selectedField"
+        },
+        {
+          "type": "flatten",
+          "fields": ["datum.values.buckets"],
+          "as": ["valueBucket"]
+        }
+      ]
     }
-  },
+  ],
 
-  "mark": {
-    "type": "bar",
-    "tooltip": true
-  },
-
-  "encoding": {
-    "y": {
-      "field": "key",
-      "type": "nominal",
-      "title": "Processing Status"
+  "scales": [
+    {
+      "name": "yscale",
+      "type": "band",
+      "domain": {
+        "data": "values",
+        "field": "valueBucket.key"
+      },
+      "range": "height",
+      "padding": 0.2
     },
-    "x": {
-      "field": "doc_count",
-      "type": "quantitative",
+    {
+      "name": "xscale",
+      "type": "linear",
+      "domain": {
+        "data": "values",
+        "field": "valueBucket.doc_count"
+      },
+      "range": "width",
+      "zero": true,
+      "nice": true
+    }
+  ],
+
+  "axes": [
+    {
+      "orient": "left",
+      "scale": "yscale",
+      "title": "Changed Value"
+    },
+    {
+      "orient": "bottom",
+      "scale": "xscale",
       "title": "Count"
     }
-  }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {
+        "data": "values"
+      },
+      "encode": {
+        "enter": {
+          "y": {
+            "scale": "yscale",
+            "field": "valueBucket.key"
+          },
+          "height": {
+            "scale": "yscale",
+            "band": 1
+          },
+          "x": {
+            "scale": "xscale",
+            "value": 0
+          },
+          "x2": {
+            "scale": "xscale",
+            "field": "valueBucket.doc_count"
+          }
+        }
+      }
+    }
+  ]
 }
