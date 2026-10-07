@@ -1,0 +1,45 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+  "data": {
+    "url": {
+      "index": "aspen-positions-mtp",
+      "body": {
+        "size": 0,
+        "aggs": {
+          "changes": {
+            "nested": {
+              "path": "changes"
+            },
+            "aggs": {
+              "fields": {
+                "terms": {
+                  "field": "changes.field",
+                  "size": 50
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "format": {
+      "property": "aggregations.changes.fields.buckets"
+    }
+  },
+
+  "mark": "bar",
+
+  "encoding": {
+    "y": {
+      "field": "key",
+      "type": "nominal",
+      "title": "Changed Field"
+    },
+    "x": {
+      "field": "doc_count",
+      "type": "quantitative",
+      "title": "Count"
+    }
+  }
+}
