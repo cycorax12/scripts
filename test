@@ -1,5 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 500,
+  "height": 300,
   "padding": 10,
 
   "signals": [
@@ -22,7 +24,44 @@
           "swt_flag_manual",
           "franking"
         ]
-      }
+      },
+      "on": [
+        {
+          "events": {"signal": "selectedField"},
+          "update": "selectedField"
+        }
+      ]
+    },
+
+    {
+      "name": "selectedValue",
+      "value": "Select value"
+    },
+
+    {
+      "name": "dropdownOpen",
+      "value": false,
+      "on": [
+        {
+          "events": "@valueSelector:click",
+          "update": "!dropdownOpen"
+        },
+        {
+          "events": "@valueItem:click",
+          "update": "false"
+        }
+      ]
+    },
+
+    {
+      "name": "setValue",
+      "value": null,
+      "on": [
+        {
+          "events": "@valueItem:click",
+          "update": "selectedValue = datum.item.key"
+        }
+      ]
     }
   ],
 
@@ -58,6 +97,7 @@
           }
         }
       },
+
       "format": {
         "property": "aggregations.changes_nested.fields.buckets"
       }
@@ -75,85 +115,120 @@
           "type": "flatten",
           "fields": ["changed_values.buckets"],
           "as": ["item"]
+        },
+        {
+          "type": "window",
+          "ops": ["row_number"],
+          "as": ["row"]
         }
       ]
     }
   ],
 
-  "scales": [
-    {
-      "name": "y",
-      "type": "band",
-      "domain": {
-        "data": "values",
-        "field": "item.key"
-      },
-      "range": "height",
-      "padding": 0.15
-    },
-
-    {
-      "name": "x",
-      "type": "linear",
-      "domain": {
-        "data": "values",
-        "field": "item.doc_count"
-      },
-      "range": "width",
-      "zero": true,
-      "nice": true
-    }
-  ],
-
-  "axes": [
-    {
-      "scale": "y",
-      "orient": "left",
-      "title": "Changed Value"
-    },
-    {
-      "scale": "x",
-      "orient": "bottom",
-      "title": "Count"
-    }
-  ],
-
   "marks": [
     {
-      "name": "valueOption",
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 10},
+          "y": {"value": 35},
+          "text": {"value": "Changed Value:"},
+          "fontSize": {"value": 13},
+          "fontWeight": {"value": "bold"}
+        }
+      }
+    },
+
+    {
+      "name": "valueSelector",
+      "type": "rect",
+      "encode": {
+        "enter": {
+          "x": {"value": 120},
+          "y": {"value": 15},
+          "width": {"value": 260},
+          "height": {"value": 32},
+          "stroke": {"value": "#888"},
+          "cornerRadius": {"value": 3},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "fill": {"value": "white"}
+        }
+      }
+    },
+
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 130},
+          "y": {"value": 36},
+          "fontSize": {"value": 13},
+          "fill": {"value": "black"},
+          "cursor": {"value": "pointer"}
+        },
+        "update": {
+          "text": {"signal": "selectedValue"}
+        }
+      }
+    },
+
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "x": {"value": 360},
+          "y": {"value": 36},
+          "text": {"value": "▼"},
+          "fontSize": {"value": 12},
+          "fill": {"value": "black"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+
+    {
+      "name": "valueItem",
       "type": "rect",
       "from": {
         "data": "values"
       },
-
       "encode": {
-        "enter": {
+        "update": {
+          "x": {"value": 120},
           "y": {
-            "scale": "y",
-            "field": "item.key"
+            "signal": "52 + ((datum.row - 1) * 30)"
           },
+          "width": {"value": 260},
+          "height": {"value": 30},
+          "fill": {"value": "white"},
+          "stroke": {"value": "#ddd"},
+          "cursor": {"value": "pointer"},
+          "opacity": {
+            "signal": "dropdownOpen ? 1 : 0"
+          }
+        }
+      }
+    },
 
-          "height": {
-            "scale": "y",
-            "band": 1
+    {
+      "type": "text",
+      "from": {
+        "data": "values"
+      },
+      "encode": {
+        "update": {
+          "x": {"value": 130},
+          "y": {
+            "signal": "72 + ((datum.row - 1) * 30)"
           },
-
-          "x": {
-            "scale": "x",
-            "value": 0
-          },
-
-          "x2": {
-            "scale": "x",
-            "field": "item.doc_count"
-          },
-
-          "cursor": {
-            "value": "pointer"
-          },
-
-          "tooltip": {
-            "signal": "{'Changed Field': selectedField, 'Changed Value': datum.item.key, 'Count': datum.item.doc_count}"
+          "text": {"field": "item.key"},
+          "fontSize": {"value": 13},
+          "fill": {"value": "black"},
+          "cursor": {"value": "pointer"},
+          "opacity": {
+            "signal": "dropdownOpen ? 1 : 0"
           }
         }
       }
