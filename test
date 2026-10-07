@@ -10,148 +10,51 @@
 
   "signals": [
     {
-      "name": "selectedField",
-      "value": "Select field",
+      "name": "mode",
+      "value": "main",
       "on": [
-        {
-          "events": "@fieldItem:click",
-          "update": "datum.key"
-        },
-        {
-          "events": "@fieldItemText:click",
-          "update": "datum.key"
-        }
+        {"events": "@fieldBox:click", "update": "'field'"},
+        {"events": "@fieldText:click", "update": "'field'"},
+        {"events": "@valueBox:click", "update": "selectedField != '' ? 'value' : 'main'"},
+        {"events": "@valueText:click", "update": "selectedField != '' ? 'value' : 'main'"},
+        {"events": "@closeButton:click", "update": "'main'"},
+        {"events": "@fieldOption:click", "update": "'main'"},
+        {"events": "@fieldOptionText:click", "update": "'main'"},
+        {"events": "@valueOption:click", "update": "'main'"},
+        {"events": "@valueOptionText:click", "update": "'main'"}
+      ]
+    },
+
+    {
+      "name": "selectedField",
+      "value": "",
+      "on": [
+        {"events": "@fieldOption:click", "update": "datum.key"},
+        {"events": "@fieldOptionText:click", "update": "datum.key"}
       ]
     },
 
     {
       "name": "selectedValue",
-      "value": "Select value",
+      "value": "",
       "on": [
-        {
-          "events": "@valueItem:click",
-          "update": "datum.item.key"
-        },
-        {
-          "events": "@valueItemText:click",
-          "update": "datum.item.key"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "'Select value'"
-        },
-        {
-          "events": "@fieldItemText:click",
-          "update": "'Select value'"
-        }
+        {"events": "@valueOption:click", "update": "datum.item.key"},
+        {"events": "@valueOptionText:click", "update": "datum.item.key"},
+        {"events": "@fieldOption:click", "update": "''"},
+        {"events": "@fieldOptionText:click", "update": "''"}
       ]
     },
 
     {
-      "name": "fieldDropdownOpen",
-      "value": false,
-      "on": [
-        {
-          "events": "@fieldSelector:click",
-          "update": "!fieldDropdownOpen"
-        },
-        {
-          "events": "@fieldSelectorText:click",
-          "update": "!fieldDropdownOpen"
-        },
-        {
-          "events": "@fieldSelectorArrow:click",
-          "update": "!fieldDropdownOpen"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "false"
-        },
-        {
-          "events": "@fieldItemText:click",
-          "update": "false"
-        },
-        {
-          "events": "@valueSelector:click",
-          "update": "false"
-        }
-      ]
-    },
-
-    {
-      "name": "valueDropdownOpen",
-      "value": false,
-      "on": [
-        {
-          "events": "@valueSelector:click",
-          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
-        },
-        {
-          "events": "@valueSelectorText:click",
-          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
-        },
-        {
-          "events": "@valueSelectorArrow:click",
-          "update": "selectedField != 'Select field' ? !valueDropdownOpen : false"
-        },
-        {
-          "events": "@valueItem:click",
-          "update": "false"
-        },
-        {
-          "events": "@valueItemText:click",
-          "update": "false"
-        },
-        {
-          "events": "@fieldSelector:click",
-          "update": "false"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "false"
-        }
-      ]
-    },
-
-    {
-      "name": "fieldPage",
+      "name": "page",
       "value": 0,
       "on": [
-        {
-          "events": "@fieldNext:click",
-          "update": "fieldPage + 1"
-        },
-        {
-          "events": "@fieldPrev:click",
-          "update": "max(0, fieldPage - 1)"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "0"
-        }
-      ]
-    },
-
-    {
-      "name": "valuePage",
-      "value": 0,
-      "on": [
-        {
-          "events": "@valueNext:click",
-          "update": "valuePage + 1"
-        },
-        {
-          "events": "@valuePrev:click",
-          "update": "max(0, valuePage - 1)"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "0"
-        },
-        {
-          "events": "@valueItem:click",
-          "update": "0"
-        }
+        {"events": "@nextButton:click", "update": "page + 1"},
+        {"events": "@prevButton:click", "update": "max(0,page-1)"},
+        {"events": "@fieldBox:click", "update": "0"},
+        {"events": "@fieldText:click", "update": "0"},
+        {"events": "@valueBox:click", "update": "0"},
+        {"events": "@valueText:click", "update": "0"}
       ]
     },
 
@@ -159,14 +62,8 @@
       "name": "activeField",
       "value": "",
       "on": [
-        {
-          "events": "@fieldItem:click",
-          "update": "datum.key"
-        },
-        {
-          "events": "@fieldItemText:click",
-          "update": "datum.key"
-        }
+        {"events": "@fieldOption:click", "update": "datum.key"},
+        {"events": "@fieldOptionText:click", "update": "datum.key"}
       ]
     },
 
@@ -174,81 +71,69 @@
       "name": "activeValue",
       "value": "",
       "on": [
+        {"events": "@valueOption:click", "update": "datum.item.key"},
+        {"events": "@valueOptionText:click", "update": "datum.item.key"},
+        {"events": "@fieldOption:click", "update": "''"},
+        {"events": "@fieldOptionText:click", "update": "''"}
+      ]
+    },
+
+    {
+      "name": "removeOldOnField",
+      "value": null,
+      "on": [
         {
-          "events": "@valueItem:click",
-          "update": "datum.item.key"
+          "events": "@fieldOption:click",
+          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')) : null"
         },
         {
-          "events": "@valueItemText:click",
-          "update": "datum.item.key"
-        },
-        {
-          "events": "@fieldItem:click",
-          "update": "''"
-        },
-        {
-          "events": "@fieldItemText:click",
-          "update": "''"
+          "events": "@fieldOptionText:click",
+          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')) : null"
         }
       ]
     },
 
     {
-      "name": "removePreviousOnField",
+      "name": "applyField",
       "value": null,
       "on": [
         {
-          "events": "@fieldItem:click",
-          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')) : null"
+          "events": "@fieldOption:click",
+          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'term':{'changes.field':datum.key}}}},'aspen-positions-mtp',datum.key)"
         },
         {
-          "events": "@fieldItemText:click",
-          "update": "activeField != '' ? (activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')) : null"
+          "events": "@fieldOptionText:click",
+          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'term':{'changes.field':datum.key}}}},'aspen-positions-mtp',datum.key)"
         }
       ]
     },
 
     {
-      "name": "applyFieldFilter",
+      "name": "removeOldOnValue",
       "value": null,
       "on": [
         {
-          "events": "@fieldItem:click",
-          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': datum.key}}}}, 'aspen-positions-mtp', datum.key)"
+          "events": "@valueOption:click",
+          "update": "activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')"
         },
         {
-          "events": "@fieldItemText:click",
-          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': datum.key}}}}, 'aspen-positions-mtp', datum.key)"
+          "events": "@valueOptionText:click",
+          "update": "activeValue != '' ? kibanaRemoveFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':activeField}},{'term':{'changes.value':activeValue}}]}}}},'aspen-positions-mtp') : kibanaRemoveFilter({'nested':{'path':'changes','query':{'term':{'changes.field':activeField}}}},'aspen-positions-mtp')"
         }
       ]
     },
 
     {
-      "name": "removeBeforeValue",
+      "name": "applyValue",
       "value": null,
       "on": [
         {
-          "events": "@valueItem:click",
-          "update": "activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')"
+          "events": "@valueOption:click",
+          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':selectedField}},{'term':{'changes.value':datum.item.key}}]}}}},'aspen-positions-mtp',selectedField + ': ' + datum.item.key)"
         },
         {
-          "events": "@valueItemText:click",
-          "update": "activeValue != '' ? kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': activeField}}, {'term': {'changes.value': activeValue}}]}}}}, 'aspen-positions-mtp') : kibanaRemoveFilter({'nested': {'path': 'changes', 'query': {'term': {'changes.field': activeField}}}}, 'aspen-positions-mtp')"
-        }
-      ]
-    },
-
-    {
-      "name": "applyValueFilter",
-      "value": null,
-      "on": [
-        {
-          "events": "@valueItem:click",
-          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
-        },
-        {
-          "events": "@valueItemText:click",
-          "update": "kibanaAddFilter({'nested': {'path': 'changes', 'query': {'bool': {'filter': [{'term': {'changes.field': selectedField}}, {'term': {'changes.value': datum.item.key}}]}}}}, 'aspen-positions-mtp', selectedField + ': ' + datum.item.key)"
+          "events": "@valueOptionText:click",
+          "update": "kibanaAddFilter({'nested':{'path':'changes','query':{'bool':{'filter':[{'term':{'changes.field':selectedField}},{'term':{'changes.value':datum.item.key}}]}}}},'aspen-positions-mtp',selectedField + ': ' + datum.item.key)"
         }
       ]
     }
@@ -263,9 +148,7 @@
           "size": 0,
           "aggs": {
             "changes_nested": {
-              "nested": {
-                "path": "changes"
-              },
+              "nested": {"path": "changes"},
               "aggs": {
                 "fields": {
                   "terms": {
@@ -304,28 +187,12 @@
     },
 
     {
-      "name": "fieldOptions",
-      "source": "fields",
-      "transform": [
-        {
-          "type": "filter",
-          "expr": "fieldDropdownOpen && datum.row > fieldPage * 5 && datum.row <= (fieldPage + 1) * 5"
-        },
-        {
-          "type": "formula",
-          "expr": "datum.row - fieldPage * 5",
-          "as": "displayRow"
-        }
-      ]
-    },
-
-    {
       "name": "values",
       "source": "raw",
       "transform": [
         {
           "type": "filter",
-          "expr": "selectedField != 'Select field' && datum.key === selectedField"
+          "expr": "datum.key === selectedField"
         },
         {
           "type": "flatten",
@@ -341,16 +208,32 @@
     },
 
     {
-      "name": "valueOptions",
+      "name": "fieldPage",
+      "source": "fields",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "mode == 'field' && datum.row > page*5 && datum.row <= (page+1)*5"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.row-page*5",
+          "as": "displayRow"
+        }
+      ]
+    },
+
+    {
+      "name": "valuePage",
       "source": "values",
       "transform": [
         {
           "type": "filter",
-          "expr": "valueDropdownOpen && datum.row > valuePage * 5 && datum.row <= (valuePage + 1) * 5"
+          "expr": "mode == 'value' && datum.row > page*5 && datum.row <= (page+1)*5"
         },
         {
           "type": "formula",
-          "expr": "datum.row - valuePage * 5",
+          "expr": "datum.row-page*5",
           "as": "displayRow"
         }
       ]
@@ -361,224 +244,228 @@
     {
       "type": "text",
       "encode": {
-        "enter": {
+        "update": {
           "x": {"value": 10},
-          "y": {"value": 29},
-          "text": {"value": "Changed Field:"},
+          "y": {"value": 28},
+          "text": {"value": "Changed Field"},
+          "fontWeight": {"value": "bold"},
           "fontSize": {"value": 13},
-          "fontWeight": {"value": "bold"}
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
         }
       }
     },
 
     {
-      "name": "fieldSelector",
+      "name": "fieldBox",
       "type": "rect",
       "encode": {
-        "enter": {
-          "x": {"value": 115},
+        "update": {
+          "x": {"value": 110},
           "y": {"value": 7},
           "width": {"value": 220},
           "height": {"value": 32},
-          "stroke": {"value": "#888"},
-          "cornerRadius": {"value": 3},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "fill": {"value": "white"}
-        }
-      }
-    },
-
-    {
-      "name": "fieldSelectorText",
-      "type": "text",
-      "encode": {
-        "enter": {
-          "x": {"value": 125},
-          "y": {"value": 28},
-          "fontSize": {"value": 13},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "text": {"signal": "selectedField"}
-        }
-      }
-    },
-
-    {
-      "name": "fieldSelectorArrow",
-      "type": "text",
-      "encode": {
-        "enter": {
-          "x": {"value": 315},
-          "y": {"value": 28},
-          "text": {"value": "▼"},
-          "fontSize": {"value": 11},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
-        }
-      }
-    },
-
-    {
-      "type": "text",
-      "encode": {
-        "enter": {
-          "x": {"value": 370},
-          "y": {"value": 29},
-          "text": {"value": "Changed Value:"},
-          "fontSize": {"value": 13},
-          "fontWeight": {"value": "bold"}
-        }
-      }
-    },
-
-    {
-      "name": "valueSelector",
-      "type": "rect",
-      "encode": {
-        "enter": {
-          "x": {"value": 485},
-          "y": {"value": 7},
-          "width": {"value": 220},
-          "height": {"value": 32},
-          "stroke": {"value": "#888"},
-          "cornerRadius": {"value": 3},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
           "fill": {"value": "white"},
-          "opacity": {
-            "signal": "selectedField == 'Select field' ? 0.6 : 1"
-          }
+          "stroke": {"value": "#888"},
+          "cornerRadius": {"value": 3},
+          "cursor": {"value": "pointer"},
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
         }
       }
     },
 
     {
-      "name": "valueSelectorText",
+      "name": "fieldText",
       "type": "text",
       "encode": {
-        "enter": {
-          "x": {"value": 495},
-          "y": {"value": 28},
-          "fontSize": {"value": 13},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
-        },
         "update": {
+          "x": {"value": 120},
+          "y": {"value": 28},
           "text": {
-            "signal": "selectedField == 'Select field' ? 'Select field first' : selectedValue"
-          }
-        }
-      }
-    },
-
-    {
-      "name": "valueSelectorArrow",
-      "type": "text",
-      "encode": {
-        "enter": {
-          "x": {"value": 685},
-          "y": {"value": 28},
-          "text": {"value": "▼"},
-          "fontSize": {"value": 11},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
-        }
-      }
-    },
-
-    {
-      "name": "fieldItem",
-      "type": "rect",
-      "from": {"data": "fieldOptions"},
-      "encode": {
-        "enter": {
-          "x": {"value": 115},
-          "width": {"value": 220},
-          "height": {"value": 30},
-          "fill": {"value": "white"},
-          "stroke": {"value": "#ddd"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {
-            "signal": "45 + ((datum.displayRow - 1) * 30)"
-          }
-        }
-      }
-    },
-
-    {
-      "name": "fieldItemText",
-      "type": "text",
-      "from": {"data": "fieldOptions"},
-      "encode": {
-        "enter": {
-          "x": {"value": 125},
-          "fontSize": {"value": 13},
-          "fill": {"value": "black"},
-          "cursor": {"value": "pointer"}
-        },
-        "update": {
-          "y": {
-            "signal": "65 + ((datum.displayRow - 1) * 30)"
+            "signal": "selectedField == '' ? 'Select field' : selectedField"
           },
-          "text": {"field": "key"}
+          "fontSize": {"value": 13},
+          "cursor": {"value": "pointer"},
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
         }
       }
     },
 
     {
-      "name": "fieldPrev",
       "type": "text",
       "encode": {
         "update": {
-          "x": {"value": 125},
-          "y": {"value": 215},
-          "text": {"value": "▲ Previous"},
-          "fontSize": {"value": 12},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "fieldDropdownOpen && fieldPage > 0 ? 1 : 0"
-          }
+          "x": {"value": 350},
+          "y": {"value": 28},
+          "text": {"value": "Changed Value"},
+          "fontWeight": {"value": "bold"},
+          "fontSize": {"value": 13},
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
         }
       }
     },
 
     {
-      "name": "fieldNext",
-      "type": "text",
-      "encode": {
-        "update": {
-          "x": {"value": 250},
-          "y": {"value": 215},
-          "text": {"value": "Next ▼"},
-          "fontSize": {"value": 12},
-          "cursor": {"value": "pointer"},
-          "opacity": {
-            "signal": "fieldDropdownOpen ? 1 : 0"
-          }
-        }
-      }
-    },
-
-    {
-      "name": "valueItem",
+      "name": "valueBox",
       "type": "rect",
-      "from": {"data": "valueOptions"},
       "encode": {
-        "enter": {
-          "x": {"value": 485},
+        "update": {
+          "x": {"value": 460},
+          "y": {"value": 7},
           "width": {"value": 220},
-          "height": {"value": 30},
+          "height": {"value": 32},
+          "fill": {"value": "white"},
+          "stroke": {"value": "#888"},
+          "cornerRadius": {"value": 3},
+          "cursor": {"value": "pointer"},
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
+        }
+      }
+    },
+
+    {
+      "name": "valueText",
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 470},
+          "y": {"value": 28},
+          "text": {
+            "signal": "selectedField == '' ? 'Select field first' : selectedValue == '' ? 'Select value' : selectedValue"
+          },
+          "fontSize": {"value": 13},
+          "cursor": {"value": "pointer"},
+          "opacity": {"signal": "mode == 'main' ? 1 : 0"}
+        }
+      }
+    },
+
+    {
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 10},
+          "y": {"value": 28},
+          "text": {
+            "signal": "mode == 'field' ? 'Select Changed Field' : mode == 'value' ? 'Select Changed Value' : ''"
+          },
+          "fontSize": {"value": 15},
+          "fontWeight": {"value": "bold"},
+          "opacity": {"signal": "mode != 'main' ? 1 : 0"}
+        }
+      }
+    },
+
+    {
+      "name": "closeButton",
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 680},
+          "y": {"value": 28},
+          "text": {"value": "✕"},
+          "fontSize": {"value": 16},
+          "cursor": {"value": "pointer"},
+          "opacity": {"signal": "mode != 'main' ? 1 : 0"}
+        }
+      }
+    },
+
+    {
+      "name": "fieldOption",
+      "type": "rect",
+      "from": {"data": "fieldPage"},
+      "encode": {
+        "update": {
+          "x": {"value": 10},
+          "y": {"signal": "45 + (datum.displayRow-1)*30"},
+          "width": {"value": 670},
+          "height": {"value": 29},
           "fill": {"value": "white"},
           "stroke": {"value": "#ddd"},
           "cursor": {"value": "pointer"}
-        },
+        }
+      }
+    },
+
+    {
+      "name": "fieldOptionText",
+      "type": "text",
+      "from": {"data": "fieldPage"},
+      "encode": {
         "update": {
-          "y": {
-            "signal": "45 + ((datum.displayRow
+          "x": {"value": 20},
+          "y": {"signal": "65 + (datum.displayRow-1)*30"},
+          "text": {"field": "key"},
+          "fontSize": {"value": 13},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+
+    {
+      "name": "valueOption",
+      "type": "rect",
+      "from": {"data": "valuePage"},
+      "encode": {
+        "update": {
+          "x": {"value": 10},
+          "y": {"signal": "45 + (datum.displayRow-1)*30"},
+          "width": {"value": 670},
+          "height": {"value": 29},
+          "fill": {"value": "white"},
+          "stroke": {"value": "#ddd"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+
+    {
+      "name": "valueOptionText",
+      "type": "text",
+      "from": {"data": "valuePage"},
+      "encode": {
+        "update": {
+          "x": {"value": 20},
+          "y": {"signal": "65 + (datum.displayRow-1)*30"},
+          "text": {"field": "item.key"},
+          "fontSize": {"value": 13},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+
+    {
+      "name": "prevButton",
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 20},
+          "y": {"value": 215},
+          "text": {"value": "◀ Previous"},
+          "fontSize": {"value": 12},
+          "cursor": {"value": "pointer"},
+          "opacity": {
+            "signal": "mode != 'main' && page > 0 ? 1 : 0"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "nextButton",
+      "type": "text",
+      "encode": {
+        "update": {
+          "x": {"value": 600},
+          "y": {"value": 215},
+          "text": {"value": "Next ▶"},
+          "fontSize": {"value": 12},
+          "cursor": {"value": "pointer"},
+          "opacity": {
+            "signal": "mode == 'field' ? (length(data('fields')) > (page+1)*5 ? 1 : 0) : mode == 'value' ? (length(data('values')) > (page+1)*5 ? 1 : 0) : 0"
+          }
+        }
+      }
+    }
+  ]
+}
