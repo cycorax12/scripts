@@ -1,93 +1,36 @@
-import requests
-import csv
+Hi Team,
 
-# Jira base URL (update with your Jira Server/DC URL)
-JIRA_BASE_URL = "https://your-domain.com"
+We are planning to migrate our Spring Boot 3.5.x applications and internal shared libraries from JDK 17 to JDK 21.
 
-# Your Jira API token (Bearer auth)
-JIRA_TOKEN = "YOUR_JIRA_API_TOKEN"
-HEADERS = {
-    "Authorization": f"Bearer {JIRA_TOKEN}",
-    "Accept": "application/json"
-}
+To minimize compatibility risks and ensure a smooth transition, we propose a phased migration approach as outlined below.
 
-def get_issues_in_project():
-    """
-    Get all issues in project ASPEN created since June 1, with pagination.
-    """
-    jql = 'project = ASPEN AND created >= "2025-06-01"'
-    url = f"{JIRA_BASE_URL}/rest/api/2/search"
+Phase 1: Docker Runtime Upgrade (JDK 17 → 21)
 
-    issues = []
-    start_at = 0
-    max_results = 1000
+* Upgrade Docker base images to JDK 21 across all applications.
+* Continue using existing applications and internal libraries compiled with JDK 17.
+* Perform regression and compatibility testing before production rollout.
 
-    while True:
-        params = {
-            "jql": jql,
-            "fields": "key",
-            "startAt": start_at,
-            "maxResults": max_results
-        }
-        response = requests.get(url, headers=HEADERS, params=params)
-        response.raise_for_status()
-        data = response.json()
+Phase 2: Application Compilation Upgrade (JDK 17 → 21)
 
-        new_issues = [issue["key"] for issue in data.get("issues", [])]
-        issues.extend(new_issues)
+* Upgrade application build pipelines and Maven configurations to JDK 21.
+* Recompile applications targeting Java 21 while continuing to use existing Java 17-compiled internal libraries.
+* Validate and deploy applications incrementally.
 
-        if start_at + max_results >= data.get("total", 0):
-            break
+Phase 3: Internal Library Upgrade (JDK 17 → 21)
 
-        start_at += max_results
+* Upgrade internal shared libraries to compile with JDK 21.
+* Publish updated library versions to our Maven repository.
+* Validate compatibility with all consuming applications.
 
-    return issues
+Key Considerations:
 
-def check_if_project_changed(issue_key):
-    """
-    Check the changelog of an issue to see if project was changed.
-    Returns list of changes.
-    """
-    url = f"{JIRA_BASE_URL}/rest/api/2/issue/{issue_key}?expand=changelog"
-    response = requests.get(url, headers=HEADERS)
-    response.raise_for_status()
-    changelog = response.json().get("changelog", {})
-    histories = changelog.get("histories", [])
-    
-    project_changes = []
-    for history in histories:
-        for item in history.get("items", []):
-            if item.get("field") == "project":
-                project_changes.append({
-                    "issue": issue_key,
-                    "changed_at": history.get("created"),
-                    "from": item.get("fromString"),
-                    "to": item.get("toString")
-                })
-    return project_changes
+* Java 17-compiled code is generally compatible with the Java 21 runtime.
+* Each phase will include appropriate testing and validation before proceeding to the next.
+* Changes will be rolled out incrementally to minimize risk and allow rollback if required.
+* Existing Spring Boot 3.5.x versions will be retained during this migration.
 
-def main():
-    issues = get_issues_in_project()
-    print(f"Found {len(issues)} issues in project ASPEN since 2025-06-01")
+This approach allows us to upgrade the runtime first, followed by application compilation and finally shared libraries, without requiring all components to be upgraded simultaneously.
 
-    all_changes = []
-    for issue in issues:
-        changes = check_if_project_changed(issue)
-        all_changes.extend(changes)
+Please review the proposed approach and share your feedback or concerns.
 
-    # Write results to CSV
-    with open("jira_project_moves.csv", "w", newline="") as csvfile:
-        fieldnames = ["Issue", "Date of Move", "From Project", "To Project"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for change in all_changes:
-            writer.writerow({
-                "Issue": change["issue"],
-                "Date of Move": change["changed_at"],
-                "From Project": change["from"],
-                "To Project": change["to"]
-            })
-    print("✅ Results written to jira_project_moves.csv")
-
-if __name__ == "__main__":
-    main()
+Thanks.
